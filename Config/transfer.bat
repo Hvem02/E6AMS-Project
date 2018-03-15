@@ -1,0 +1,1 @@
+avrdude -CavrdudeWin.conf -v -patmega2560 -cwiring -PCOM3 -b115200 -D -Uflash:w:..\cmake-build-debug\E4PRJ4_Transporter
