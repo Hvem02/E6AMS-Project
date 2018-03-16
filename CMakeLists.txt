@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.6)
-project(E4PRJ4_Transporter)
+project(E6AMS)
 
 set(CMAKE_C_STANDARD 11)
 
@@ -12,11 +12,9 @@ SET(CMAKE_CXX_COMPILER avr-g++)
 SET(CMAKE_C_FLAGS "-mmcu=${MCU} -DF_CPU=${F_CPU} -Os")
 SET(CMAKE_C_LINK_FLAGS "-mmcu=${MCU}")
 
-#set(${CMAKE_PROJECT_NAME}_PORT /dev/ttyACM0)
-
 SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
-set(SOURCE_FILES main.c)
+set(SOURCE_FILES main.c libs/uart.c libs/uart.h)
 add_executable(E4PRJ4_Transporter ${SOURCE_FILES})
