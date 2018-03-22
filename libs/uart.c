@@ -116,7 +116,7 @@ void InitUART0(unsigned long BaudRate, char Parity, unsigned int stop_bits,
             return;
         }
         // UMSELn1 = 0 og UMSELn0 = 0 => Async mode
-        UCSR0C &= ~(0b11 << 1);
+        UCSR0C &= ~(0b11 << 6);
 
         // UCSZn2   | UCSZn1    | UCSZn0    | Character Size
         // 0        |   0       |   0       |   5-bit
