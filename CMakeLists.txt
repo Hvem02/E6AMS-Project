@@ -16,5 +16,5 @@ SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
-set(SOURCE_FILES main.c libs/uart.c libs/uart.h)
-add_executable(E4PRJ4_Transporter ${SOURCE_FILES})
+set(SOURCE_FILES main.c libs/uart.c libs/uart.h libs/lc-05.c libs/lc-05.h)
+add_executable(${PROJECT_NAME} ${SOURCE_FILES})
