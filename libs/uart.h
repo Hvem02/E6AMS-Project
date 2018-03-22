@@ -14,13 +14,13 @@
 * Henning Hargaard, 4/11 2015           *
  * Modified by munk on 3/16/18          *
 *****************************************/
-void InitUART0(unsigned long BaudRate, char Parity,
+void initUART0(unsigned long BaudRate, char Parity,
                unsigned int stop_bits, unsigned int character_size, unsigned char mode);
-uint8_t CharReady();
-char ReadChar();
-void SendChar(char Tegn);
-void SendString(char* Streng);
-void SendInteger(int Tal);
+uint8_t charReady();
+char readChar();
+void sendChar(char Tegn);
+void sendString(char *Streng);
+void sendInteger(int Tal);
 /****************************************/
 
 #endif //E4PRJ4_TRANSPORTER_UART_H

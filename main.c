@@ -35,8 +35,7 @@
 #include "libs/uart.h"
 
 int main() {
-    InitUART0(UART0BAUD, 'O', 1, 8, 1);
-
+    initUART0(UART0BAUD, 'O', 1, 8, 1);
     while (1) {
         for (int i = 0; i < 10; ++i) {
             _delay_ms(100);

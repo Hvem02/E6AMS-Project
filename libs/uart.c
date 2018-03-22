@@ -68,7 +68,7 @@
  * @param character_size    The amount of characters send: 5-9 supported, any other will not set anything up
  * @param mode              Normal mode = 0, fast mode = 1
  */
-void InitUART0(unsigned long BaudRate, char Parity, unsigned int stop_bits,
+void initUART0(unsigned long BaudRate, char Parity, unsigned int stop_bits,
                unsigned int character_size, unsigned char mode) {
 
     if ((BaudRate >= 110) && (BaudRate <= 115200) && (character_size >= 5) && (character_size <= 9)) {
@@ -172,7 +172,7 @@ void InitUART0(unsigned long BaudRate, char Parity, unsigned int stop_bits,
 }
 
 
-uint8_t CharReady() {
+uint8_t charReady() {
     // UCSRnA - Control and status register A:
     //  7       6      5       4     3      2       1      0
     //| RXCn | TXCn | UDREn | FEn | DORn | UPEn | U2Xn | MPCMn |
@@ -182,25 +182,25 @@ uint8_t CharReady() {
 }
 
 
-char ReadChar() {
-    while (CharReady() == 0);
+char readChar() {
+    while (charReady() == 0);
 
     // læsning af modtaget tegn => char x = UDRx;
     return UDR0;
 }
-void SendChar(char Tegn) {
+void sendChar(char Tegn) {
     // Send tegn => char x = "a"; UDRx = x;
     while ((UCSR0A & (0b1 << 5)) == 0);
 
     UDR0 = Tegn;
 }
-void SendString(char* Streng) {
+void sendString(char *Streng) {
     while (*Streng != '\0') {
-        SendChar(*Streng++);
+        sendChar(*Streng++);
     }
 }
-void SendInteger(int Tal) {
+void sendInteger(int Tal) {
     char buffer[8];
     itoa(Tal, buffer, 10);
-    SendString(buffer);
+    sendString(buffer);
 }
