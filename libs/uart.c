@@ -68,12 +68,21 @@
  * @param character_size    The amount of characters send: 5-9 supported, any other will not set anything up
  * @param mode              Normal mode = 0, fast mode = 1
  */
+
+
 void InitUART0(unsigned long BaudRate, char Parity, unsigned int stop_bits,
                unsigned int character_size, unsigned char mode) {
 
     if ((BaudRate >= 110) && (BaudRate <= 115200) && (character_size >= 5) && (character_size <= 9)) {
 
 
+        /*
+         * if (uart_number < 3) {
+            #define UCSRnA _SFR_MEM8(0xC0+(8*uart_number))
+            #define UCSRnB _SFR_MEM8(0xC1+(8*uart_number))
+            #define UCSRnC _SFR_MEM8(0xC2+(8*uart_number))
+        }
+         */
         // UCSRnB - Control and status register B:
         //  7           6       5       4       3        2       1      0
         //| RXCIEn | TXIECn | UDRIEn | RXENn | TXENn | UCSZn2 | RXB8n | TXB8n |
@@ -102,8 +111,6 @@ void InitUART0(unsigned long BaudRate, char Parity, unsigned int stop_bits,
             UCSR0C |= 0b11 << 4;
         } else if (Parity == 'd' || Parity == 'D') {
             UCSR0C &= ~(0b11 << 4);
-        } else {
-            return;
         }
 
         // USBSn: 0 = 1 stop bit; 1 = 2 stop bits
@@ -117,6 +124,7 @@ void InitUART0(unsigned long BaudRate, char Parity, unsigned int stop_bits,
         }
         // UMSELn1 = 0 og UMSELn0 = 0 => Async mode
         UCSR0C &= ~(0b11 << 6);
+
 
         // UCSZn2   | UCSZn1    | UCSZn0    | Character Size
         // 0        |   0       |   0       |   5-bit
@@ -147,12 +155,13 @@ void InitUART0(unsigned long BaudRate, char Parity, unsigned int stop_bits,
             return;
         }
 
+        UCSR0C = 0b00100110;
 
         // UCSRnA - Control and status register A:
         //  7       6      5       4     3      2       1      0
         //| RXCn | TXCn | UDREn | FEn | DORn | UPEn | U2Xn | MPCMn |
         // Operating Mode   | Equation for calculating baud rate    | Equation for calculating UBRR Value
-        // Aync normal mode | BAUD = f_{osc}/(16*UBRRn + 1)         | UBRRn = (f_{osc}/(16*BAUD))-1
+        // Aync normal mode | BAUD = f_{osc}/(16*(UBRRn + 1))         | UBRRn = (f_{osc}/(16*BAUD))-1
         // U2Xn = 0         |
         // -----------------------------------------------------------------------------------------------
         // Async double     | BAUD = f_{osc}/(8*(UBRRn+1))          | UBRRn = (f_{osc}/(8*BAUD))-1
@@ -161,10 +170,10 @@ void InitUART0(unsigned long BaudRate, char Parity, unsigned int stop_bits,
 
         if (mode == 0) { // Normal mode
             UCSR0A &= ~(0b1 << 1);
-            UBRR0 = (uint16_t) ((F_CPU/(16*BaudRate)) - 1);
+            UBRR0 = (uint16_t) ((8*BaudRate + F_CPU)/(16*BaudRate) - 1);
         } else if (mode == 1) { // Double speed
             UCSR0A |= 0b1 << 1;
-            UBRR0 = (uint16_t) ((F_CPU/(8*BaudRate)) - 1);
+            UBRR0 = (uint16_t) ((F_CPU)/(8*BaudRate) - 1);
         } else {
             return;
         }
