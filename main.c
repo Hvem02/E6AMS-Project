@@ -25,8 +25,6 @@
  * | 115200             | 8     | -3.5% | 16    | 2.1%  |
  *
  *
- * !!!!!!!!!!NOTE!!!!!!!
- * In normal mode 76800 + 115200 DOES NOT WORK. They do in fast mode tho.
  */
 
 #define UART0BAUD 115200
@@ -35,10 +33,15 @@
 #include "libs/uart.h"
 
 int main() {
-    initUART0(UART0BAUD, 'O', 1, 8, 1);
+    InitUART0(UART0BAUD, 'E', 1, 8, 1);
+//    InitUART(&UART0, UART0BAUD, 'E', 1, 8, 1);
+
     while (1) {
+        SendString(" - Hello World - ");
+        SendChar('B');
+        SendInteger(123);
         for (int i = 0; i < 10; ++i) {
-            _delay_ms(100);
+            _delay_ms(1);
         }
     }
 }
