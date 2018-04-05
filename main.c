@@ -23,26 +23,20 @@
  * | 57600              | 16    | 2.1%  | 34    | -0.8% |
  * | 76800              | 12    | 0.2%  | 25    | 0.2%  |
  * | 115200             | 8     | -3.5% | 16    | 2.1%  |
- *
- *
  */
 
-#define UART0BAUD 115200
-
+#include <avr/io.h>
 #include <util/delay.h>
 #include "libs/uart.h"
 
-int main() {
-    InitUART0(UART0BAUD, 'E', 1, 8, 1);
-//    InitUART(&UART0, UART0BAUD, 'E', 1, 8, 1);
+int main()
+{
+    initUart(0, 115200, 'O', 1, 8, 'N');
 
-    while (1) {
-        SendString(" - Hello World - ");
-        SendChar('B');
-        SendInteger(123);
-        for (int i = 0; i < 10; ++i) {
-            _delay_ms(1);
-        }
+    while(1)
+    {
+        sendChar(0, 'A');
+
+        _delay_ms(1000);
     }
 }
-
