@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 /**
- * Method for setting up UART
+ * Function for setting up UART
  *
  * @param uartNum   Which UART is used: 0 - 3
  * @param baudRate  Baudrate for the UART: 110 - 115200
@@ -13,50 +13,92 @@
  * @param stopBits  Number of stopbits used: 1 - 2
  * @param charSize  Size of characters: 5 - 9
  * @param mode      Normal or fast mode: 'N' or 'F'
+ * @return          Returns 0 on succes
  */
-uint8_t initUart(uint8_t uartNum, uint32_t baudRate,
+uint8_t uartInit(uint8_t uartNum, uint32_t baudRate,
               char parity, uint8_t stopBits,
               uint8_t charSize, char mode);
 
 /**
+ * Function for sending a single byte
  *
  * @param uartNum   Which UART is used: 0 - 3
- * @return
+ * @param value     Character to be sent
+ * @return          Returns 0 on succes
  */
-bool isCharReceived(uint8_t uartNum);
+uint8_t uartSendByte(uint8_t uartNum, uint8_t value);
 
 /**
+ * Function for sending an array of bytes
  *
  * @param uartNum   Which UART is used: 0 - 3
- * @param character
+ * @param array     Array of bytes to be sent
+ * @param size      Size of
+ * @return          Returns 0 on succes
  */
-void sendChar(uint8_t uartNum, char character);
+uint8_t uartSendByteArray(uint8_t uartNum, uint8_t* array, uint16_t size);
 
 /**
+ * Function for sending a null-terminated string
  *
  * @param uartNum   Which UART is used: 0 - 3
- * @return
+ * @param string    Null terminated string to be sendt
+ * @return          Returns 0 on succes
  */
-char receiveChar(uint8_t uartNum);
+uint8_t uartSendString(uint8_t uartNum, char* string);
 
 /**
+ * Function for sending an integer formated as text
  *
  * @param uartNum   Which UART is used: 0 - 3
- * @param string
+ * @param value     Value to be sent
+ * @param base      Base value has to written in: 2 - 36
+ * @return          Returns 0 on succes
  */
-void sendString(uint8_t uartNum, char* string);
+uint8_t uartSendInteger(uint8_t uartNum, int16_t value, uint8_t base);
 
 /**
+ * Function for receiving a single byte
  *
  * @param uartNum   Which UART is used: 0 - 3
- * @param value
+ * @param value     Pointer to variable to hold received character
+ * @return          Returns 0 on succes
  */
-void sendInteger(uint8_t uartNum, int16_t value);
+uint8_t uartReceiveByte(uint8_t uartNum, uint8_t* value);
 
 /**
- * Method for reading an char, but with timeout on 10 ms
- * @return The char if received within 10 ms, else noReturn
+ * Function for receiving an array of data
+ *
+ * @param uartNum   Which UART is used: 0 - 3
+ * @param value     Pointer to variable to hold received character
+ * @param size      Size of receive buffer
+ * @return          Returns 0 on succes
  */
-char readCharWithDelay();
-char noReturn = '!';
+uint8_t  uartReceiveByteArray(uint8_t uartNum, uint8_t* value, uint16_t size);
+
+/**
+ * Function for receiving a null-terminated string
+ *
+ * @param uartNum   Which UART is used: 0 - 3
+ * @param string    Char buffer for revceived message
+ * @return          Returns 0 on succes
+ */
+uint8_t uartReceiveString(uint8_t uartNum, char* string);
+
+/**
+ * Function for checking if a byte has been received
+ *
+ * @param uartNum   Which UART is used: 0 - 3
+ * @return          Returns 0 on if byte is received
+ */
+uint8_t uartByteReceived(uint8_t uartNum);
+
+/**
+ * Function for checking if a byte has been transmitted
+ *
+ * @param uartNum   Which UART is used: 0 - 3
+ * @return          Returns 0 on if byte is transmitted
+ */
+uint8_t uartByteTransmitted(uint8_t uartNum);
+
 #endif //UART_H

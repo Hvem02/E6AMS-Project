@@ -31,11 +31,14 @@
 
 int main()
 {
-    initUart(0, 115200, 'O', 1, 8, 'N');
+    uartInit(0, 115200, 'O', 1, 8, 'N');
 
     while(1)
     {
-        sendChar(0, 'A');
-        _delay_ms(1000);
+        uint8_t c[3] = {0};
+        uartReceiveByteArray(0, c, 3);
+        uartSendByteArray(0, c, 3);
+
+        _delay_ms(10);
     }
 }
