@@ -7,56 +7,67 @@
 
 void initLC05() {
     // Init uart1
-    initUart(1, 9600, 'O', 1, 8, 'N');
+    initUart(uartLC05, 9600, 'O', 1, 8, 'N');
     if (!lc05Ready()) {
         // TODO send error via uart 0
-//        sendString()
+        sendString(uartDebug, "!!!!!WARNING!!!!\r\nFailed to setup LC05!!!\r\n");
     }
 }
 
 bool lc05Ready() {
-    return sendWithAck(atTest);
+    char buffer[20] = {0};
+    bool success = sendWithResponse(atTest, buffer);
+    if (!success) {
+        sendString(uartDebug, "LC05 failed ATTest, response:\r\n");
+        sendString(uartDebug, buffer);
+    }
 }
 
 bool lc05Reset() {
-    return sendWithAck(atReset);
-}
-
-char* lc05Version() {
-    // TODO maybe only return the version, currently it will return +VERSION: <Param> OK
-    return sendWithResponse(atVersion);
-}
-
-
-bool sendWithAck(const char* message) {
-    if (sendWithResponse(message) == atOK) {
-        return true;
+    char buffer[20] = {0};
+    bool success = sendWithResponse(atReset, buffer);
+    if (!success) {
+        sendString(uartDebug, "LC05 failed ATReset, response:\r\n");
+        sendString(uartDebug, buffer);
     }
-    // TODO send error message on uart0, with response
-    return false;
 }
 
-char* sendWithResponse(const char* message) {
+void lc05Version(char* versionBuffer) {
+    // TODO maybe only return the version, currently it will return +VERSION: <Param> OK
+    sendWithResponse(atVersion, versionBuffer);
+}
+
+
+bool sendWithResponse(const char* message, char* buffer) {
     char at_send_string[strlen(message)+2];
     strcat(at_send_string, "\r\n");
-    sendString(uartNum, at_send_string);
-    char response[1028];
+    sendString(uartLC05, at_send_string);
     int i = 0;
+
     while (1) {
         char res = readCharWithDelay();
 
         if (res == noReturn) {
-            return response;
+            // Timeout error
+            sendString(0, timeoutError);
+            return false;
+        } else if (res == 'K' && i > 0) {
+            // handle OK
+            if (buffer[i-1] == 'O') {
+                // response OK !
+                return true;
+            }
+        } else if (res == 'L' && i > 2) {
+            if (buffer[i-3] == 'F' && buffer[i-2] == 'A' && buffer[i-1] == 'I') {
+                // response Failed !
+                return false;
+            }
         }
 
-        // TODO handle overflow (can we receive larger strings than 1028?
-
-        response[i++] = res;
+        buffer[i++] = res;
     }
 }
 
 void writeErrorCodeToUser(char value) {
-    // TODO send via uart0 from errorCodes[value]
-
-    sendString(0, errorCodes[value]);
+    sendString(uartDebug, errorCodes[value]);
 }

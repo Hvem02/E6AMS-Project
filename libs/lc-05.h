@@ -14,18 +14,20 @@ bool lc05Ready();
 
 bool lc05Reset();
 
-char *lc05Version();
+void lc05Version(char* versionBuffer);
 
-bool sendWithAck(const char *message);
-
-char *sendWithResponse(const char *message);
+bool sendWithResponse(const char *message, char* buffer);
 
 void writeErrorCodeToUser(char value);
 
-const char uartNum = 1;
+const char uartDebug = 0;
+const char uartLC05 = 1;
+
+const char* timeoutError = "I did not receive a char within the 10 ms timeout";
 
 // AT commands
 const char *atOK = "OK";
+const char *atFail = "FAIL";
 const char *atTest = "AT";
 const char *atReset = "AT+RESET";
 const char *atVersion = "AT+VERSION?";
