@@ -53,4 +53,10 @@ void sendString(uint8_t uartNum, char* string);
  */
 void sendInteger(uint8_t uartNum, int16_t value);
 
+/**
+ * Method for reading an char, but with timeout on 10 ms
+ * @return The char if received within 10 ms, else noReturn
+ */
+char readCharWithDelay();
+char noReturn = '!';
 #endif //UART_H

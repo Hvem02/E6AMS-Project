@@ -71,6 +71,7 @@
 #include "uart.h"
 #include <avr/io.h>
 #include <stdlib.h>
+#include <util/delay.h>
 
 //***************************************************************
 // Defines and constants                                        *
@@ -410,14 +411,29 @@ static bool readyToTransmit(uint8_t uartNum)
     }
 }
 
-static bool readyToReceive(uint8_t uartNum)
-{
-    if((UCSR_A(uartNum) & 0b10000000) == 0b10000000)
-    {
+static bool readyToReceive(uint8_t uartNum) {
+    if ((UCSR_A(uartNum) & 0b10000000) == 0b10000000) {
         return true;
-    }
-    else
-    {
+    } else {
         return false;
     }
 }
+
+
+/**
+ * Same as readChar, but with timeout,
+ * On on returned char after 10 ms it will return !
+ *
+ * @return
+ */
+char readCharWithDelay() {
+    for (int i = 0; i < 10; ++i) {
+        if (charReady() == 1) {
+            return UDR0;
+        }
+        // TODO Review this delay
+        _delay_ms(1);
+    }
+    return noReturn;
+}
+
