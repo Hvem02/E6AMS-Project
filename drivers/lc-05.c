@@ -7,10 +7,10 @@
 
 void initLC05() {
     // Init uart1
-    initUart(uartLC05, 9600, 'O', 1, 8, 'N');
+    uartInit(uartLC05, 9600, 'O', 1, 8, 'N');
     if (!lc05Ready()) {
         // TODO send error via uart 0
-        sendString(uartDebug, "!!!!!WARNING!!!!\r\nFailed to setup LC05!!!\r\n");
+        uartSendString(uartDebug, "!!!!!WARNING!!!!\r\nFailed to setup LC05!!!\r\n");
     }
 }
 
@@ -18,8 +18,8 @@ bool lc05Ready() {
     char buffer[20] = {0};
     bool success = sendWithResponse(atTest, buffer);
     if (!success) {
-        sendString(uartDebug, "LC05 failed ATTest, response:\r\n");
-        sendString(uartDebug, buffer);
+        uartSendString(uartDebug, "LC05 failed ATTest, response:\r\n");
+        uartSendString(uartDebug, buffer);
     }
 }
 
@@ -27,8 +27,8 @@ bool lc05Reset() {
     char buffer[20] = {0};
     bool success = sendWithResponse(atReset, buffer);
     if (!success) {
-        sendString(uartDebug, "LC05 failed ATReset, response:\r\n");
-        sendString(uartDebug, buffer);
+        uartSendString(uartDebug, "LC05 failed ATReset, response:\r\n");
+        uartSendString(uartDebug, buffer);
     }
 }
 
@@ -41,7 +41,7 @@ void lc05Version(char* versionBuffer) {
 bool sendWithResponse(const char* message, char* buffer) {
     char at_send_string[strlen(message)+2];
     strcat(at_send_string, "\r\n");
-    sendString(uartLC05, at_send_string);
+    uartSendString(uartLC05, at_send_string);
     int i = 0;
 
     while (1) {
@@ -49,7 +49,7 @@ bool sendWithResponse(const char* message, char* buffer) {
 
         if (res == noReturn) {
             // Timeout error
-            sendString(0, timeoutError);
+            uartSendString(0, timeoutError);
             return false;
         } else if (res == 'K' && i > 0) {
             // handle OK
@@ -69,5 +69,5 @@ bool sendWithResponse(const char* message, char* buffer) {
 }
 
 void writeErrorCodeToUser(char value) {
-    sendString(uartDebug, errorCodes[value]);
+    uartSendString(uartDebug, errorCodes[value]);
 }

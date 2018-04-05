@@ -27,7 +27,7 @@
 
 #include <avr/io.h>
 #include <util/delay.h>
-#include "libs/uart.h"
+#include "drivers/uart.h"
 
 int main()
 {
