@@ -14,7 +14,7 @@
  * @param charSize  Size of characters: 5 - 9
  * @param mode      Normal or fast mode: 'N' or 'F'
  */
-void initUart(uint8_t uartNum, uint32_t baudRate,
+uint8_t initUart(uint8_t uartNum, uint32_t baudRate,
               char parity, uint8_t stopBits,
               uint8_t charSize, char mode);
 
@@ -24,13 +24,6 @@ void initUart(uint8_t uartNum, uint32_t baudRate,
  * @return
  */
 bool isCharReceived(uint8_t uartNum);
-
-/**
- *
- * @param uartNum   Which UART is used: 0 - 3
- * @return
- */
-char readChar(uint8_t uartNum);
 
 /**
  *
