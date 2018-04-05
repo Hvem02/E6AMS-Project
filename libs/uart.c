@@ -73,6 +73,22 @@
 #include <stdlib.h>
 
 //***************************************************************
+// Defines and constants                                        *
+//***************************************************************
+
+#define UART_SUCCES             0
+#define UART_ERROR_UART_NUM     1
+#define UART_ERROR_PARITY       2
+#define UART_ERROR_STOP_BITS    3
+#define UART_ERROR_SYNC_MODE    4
+#define UART_ERROR_CHAR_SIZE    5
+#define UART_ERROR_SPEED_MODE   6
+#define UART_ERROR_BAUDRATE     7
+
+#define UART_ERROR_UNDEFINED    69
+
+
+//***************************************************************
 // Macro Functions for Genericness								*
 //***************************************************************
 
@@ -92,13 +108,13 @@
 static bool validateUartNumber(uint8_t uartNum);
 static bool validateBaudRate(uint32_t baudRate);
 
-static void enableTransmitterReceiver(uint8_t uartNum);
-static void setParity(uint8_t uartNum, char parity);
-static void setStopBits(uint8_t uartNum, uint8_t stopBits);
-static void setSynchronisationMode(uint8_t uartNum, char syncMode);
-static void setCharacterSize(uint8_t uartNum, uint8_t charSize);
-static void setSpeedMode(uint8_t uartNum, char mode);
-static void setBaudRate(uint8_t uartNum, uint32_t baudRate);
+static uint8_t enableTransmitterReceiver(uint8_t uartNum);
+static uint8_t setParity(uint8_t uartNum, char parity);
+static uint8_t setStopBits(uint8_t uartNum, uint8_t stopBits);
+static uint8_t setSynchronisationMode(uint8_t uartNum, char syncMode);
+static uint8_t setCharacterSize(uint8_t uartNum, uint8_t charSize);
+static uint8_t setSpeedMode(uint8_t uartNum, char mode);
+static uint8_t setBaudRate(uint8_t uartNum, uint32_t baudRate);
 
 static char getSpeedMode(uint8_t uartNum);
 
@@ -108,18 +124,18 @@ static bool readyToReceive(uint8_t uartNum);
 //***************************************************************
 // Public Function Implementation								*
 //***************************************************************
-void initUart(uint8_t uartNum, uint32_t baudRate,
-              char parity, uint8_t stopBits,
-              uint8_t charSize, char mode)
+uint8_t initUart(uint8_t uartNum, uint32_t baudRate,
+                 char parity, uint8_t stopBits,
+                 uint8_t charSize, char mode)
 {
     if(validateUartNumber(uartNum) == false)
     {
-        return;
+        return UART_ERROR_UART_NUM;
     }
 
     if(validateBaudRate(baudRate) == false)
     {
-        return;
+        return UART_ERROR_BAUDRATE;
     }
 
     enableTransmitterReceiver(uartNum);
@@ -229,12 +245,13 @@ static bool validateBaudRate(uint32_t baudRate)
     }
 }
 
-static void enableTransmitterReceiver(uint8_t uartNum)
+static uint8_t enableTransmitterReceiver(uint8_t uartNum)
 {
     UCSR_B(uartNum) |= 0b00011000;
+    return UART_SUCCES;
 }
 
-static void setParity(uint8_t uartNum, char parity)
+static uint8_t setParity(uint8_t uartNum, char parity)
 {
     if (parity == 'E' || parity == 'e')
     {
@@ -251,11 +268,11 @@ static void setParity(uint8_t uartNum, char parity)
     }
     else
     {
-        return;
+        return UART_ERROR_PARITY;
     }
 }
 
-static void setStopBits(uint8_t uartNum, uint8_t stopBits)
+static uint8_t setStopBits(uint8_t uartNum, uint8_t stopBits)
 {
     if (stopBits == 1)
     {
@@ -267,11 +284,11 @@ static void setStopBits(uint8_t uartNum, uint8_t stopBits)
     }
     else
     {
-        return;
+        return UART_ERROR_STOP_BITS;
     }
 }
 
-static void setSynchronisationMode(uint8_t uartNum, char syncMode)
+static uint8_t setSynchronisationMode(uint8_t uartNum, char syncMode)
 {
     if(syncMode == 'A' || syncMode == 'a')
     {
@@ -284,11 +301,11 @@ static void setSynchronisationMode(uint8_t uartNum, char syncMode)
     }
     else
     {
-        return;
+        return UART_ERROR_SYNC_MODE;
     }
 }
 
-static void setCharacterSize(uint8_t uartNum, uint8_t charSize)
+static uint8_t setCharacterSize(uint8_t uartNum, uint8_t charSize)
 {
     if (charSize == 5)
     {
@@ -319,11 +336,11 @@ static void setCharacterSize(uint8_t uartNum, uint8_t charSize)
     }
     else
     {
-        return;
+        return UART_ERROR_CHAR_SIZE;
     }
 }
 
-static void setSpeedMode(uint8_t uartNum, char mode)
+static uint8_t setSpeedMode(uint8_t uartNum, char mode)
 {
     if(mode == 'N' || mode == 'n')
     {
@@ -335,16 +352,11 @@ static void setSpeedMode(uint8_t uartNum, char mode)
     }
     else
     {
-        return;
+        return UART_ERROR_SPEED_MODE;
     }
 }
 
-// DELETE ME
-#define F_CPU 16000000
-
-
-
-static void setBaudRate(uint8_t uartNum, uint32_t baudRate)
+static uint8_t setBaudRate(uint8_t uartNum, uint32_t baudRate)
 {
     if(validateBaudRate(baudRate) == false)
     {
@@ -366,7 +378,7 @@ static void setBaudRate(uint8_t uartNum, uint32_t baudRate)
     }
     else
     {
-        return;
+        return UART_ERROR_BAUDRATE;
     }
 
 	UBRR_H(uartNum) = (UBRRValue >> 8);
