@@ -36,7 +36,6 @@ int main()
     while(1)
     {
         sendChar(0, 'A');
-
         _delay_ms(1000);
     }
 }

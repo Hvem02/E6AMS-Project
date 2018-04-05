@@ -7,8 +7,10 @@
 
 void initLC05() {
     // Init uart1
+    initUart(1, 9600, 'O', 1, 8, 'N');
     if (!lc05Ready()) {
         // TODO send error via uart 0
+//        sendString()
     }
 }
 
@@ -37,7 +39,7 @@ bool sendWithAck(const char* message) {
 char* sendWithResponse(const char* message) {
     char at_send_string[strlen(message)+2];
     strcat(at_send_string, "\r\n");
-    sendString(at_send_string);
+    sendString(uartNum, at_send_string);
     char response[1028];
     int i = 0;
     while (1) {
@@ -55,4 +57,6 @@ char* sendWithResponse(const char* message) {
 
 void writeErrorCodeToUser(char value) {
     // TODO send via uart0 from errorCodes[value]
+
+    sendString(0, errorCodes[value]);
 }
