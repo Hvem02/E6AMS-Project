@@ -1,214 +1,411 @@
+// UDRn     USART Data Register
+//          Data to be transmitted and received data is stored in this register
+
+
+// UCSRnA   Control and Status Register A
+//| 7     | 6     | 5     | 4     | 3     | 2     | 1     | 0     |
+//| RXCn  | TXCn  | UDREn | FEn   | DORn  | UPEn  | U2Xn  | MPCMn |
 //
-// Created by munk on 3/16/18.
+// RXCn     : USART Receive Complete
+// TXCn     : USART Transmit Complete
+// UDREn    : USART Data Register Empty
+// FEn      : Frame Error
+// DORn     : Data OverRun
+// UPEn     : USART Parity Error
+// U2Xn     : Double the USART Transmission Speed
+// MPCMn    : Multi-processor Communication Mode
+
+
+// UCSRnB   Control and Status Register B
+//| 7      | 6      | 5      | 4      | 3      | 2      | 1      | 0      |
+//| RXCIEn | TXIECn | UDRIEn | RXENn  | TXENn  | UCSZn2 | RXB8n  | TXB8n  |
 //
-
-// Teori:
-
-// UCSRnA - Control and status register A:
-//  7       6      5       4     3      2       1      0
-//| RXCn | TXCn | UDREn | FEn | DORn | UPEn | U2Xn | MPCMn |
-
-// Når RXCn er 1:   Nyt tegn modtaget og kan hentes i UDR
-// Når TXCn er 1:   Sender tom, klar til at sende nyt tegn, samt sendeskifteregister tomt
-// Når UDREn er 1:  Klar til at sende nyt tegn (der må skrives til UDR
-// FEn:             Frame error, modtaget fejl i stopbit
-// DORn:            Data overrrun, tegn modtaget inden foregående er blevet læst af SW.
-// PEn:             Parity error, modtaget tegn har parity fejl.
+// RXCIEn   : RX Complete Interrupt Enable
+// TXIECn   : TX Complete Interrupt Enable
+// UDRIEn   : USART DATA Register Empty Interrupt Enable
+// RXENn    : Receiver Enable
+// TXENn    : Transmitter Enable
+// UCSZn2   : Character Size 2
+// RXB8n    : Receiver Data Bit 8
+// TXB8n    : Transmitter Data Bit 8
 
 
-// UCSRnB - Control and status register B:
-//  7           6       5       4       3        2       1      0
-//| RXCIEn | TXIECn | UDRIEn | RXENn | TXENn | UCSZn2 | RXB8n | TXB8n |
+// UCSRnC   Control and Status Register C
+//| 7       | 6       | 5       | 4       | 3       | 2        | 1      | 0       |
+//| UMSELn1 | UMSELn0 | UPMn1   | UPMn0   | USBSn   | UCSZn1   | UCSZn0 | UCROLn  |
+//
+// UMSELn1  : USART Mode Select 1
+// UMSELn0  : USART Mode Select 0
+// UPMn1    : Parity Mode 1
+// UPMn0    : Parity Mode 0
+// USBSn    : Stop Bit Select
+// UCSZn1   : Character Size 1
+// UCSZn0   : Character Size 0
+// UCROLn   : Clock Polarity
 
-// 7-5 (begge inklusiv) bruges ved interrupt styret USART
-// RXENn = 1: RX Enable - tænder for modtageren
-// TXENn = 1: TX Enable - tænder for senderen
 
-// UCSRnC - Control and status register C
-//  7           6         5       4     3         2       1         0
-//| UMSELn1 | UMSELn0 | UPMn1 | UPMn0 | USBSn | UCSZn1 | UCSZn0 | UCROLn |
-
-
-// UCSZn1 og UCSZn0
-// USBSn: 0 = 1 stop bit; 1 = 2 stop bits
-// UMSELn1 = 0 og UMSELn0 = 0 => Async mode
-// UPMn1    | UPMn0 |  Parity Mode
-// 0        | 0     |   Disabled
-// 0        | 1     |   Reserved
-// 1        | 0     |   Enabled, Even Parity
-// 1        | 1     |   Enabled, Odd Parity
-
-// UCSZn2   | UCSZn1    | UCSZn0    | Character Size
-// 0        |   0       |   0       |   5-bit
-// 0        |   0       |   1       |   6-bit
-// 0        |   1       |   0       |   7-bit
-// 0        |   1       |   1       |   8-bit
-// 1        |   1       |   1       |   9-bit
-// Rest in between are reserved
-
-// Operating Mode   | Equation for calculating baud rate    | Equation for calculating UBRR Value
-// Aync normal mode | BAUD = f_{osc}/(16*UBRRn + 1)         | UBRRn = (f_{osc}/(16*BAUD))-1
-// U2Xn = 0         |
-// -----------------------------------------------------------------------------------------------
-// Async double     | BAUD = f_{osc}/(8*(UBRRn+1))          | UBRRn = (f_{osc}/(8*BAUD))-1
-// speed mode       |
-// U2Xn = 1
+// UBRRnH   USART Buad Rate Registers
+// UBRRnL
+//| 15  | 14  | 13  | 12  | 11  | 10  | 9   | 8   |
+//| -   | -   | -   | -   | UBRR[11:8]            | UBRRnH
+//|                         UBRR[7:0]             | UBRRnL
+//| 7   | 6   | 5   | 4   | 3   | 2   | 1   | 0   |
+//
+// Buadrate error in response to speed for 16 MHz
+// following table is found https://arduino.stackexchange.com/a/299
+// +-----------------+---------------+---------------+
+// | Baud Rate (bps) | Async Normal  | Async Fast    |
+// |                 | UBRRn | Error | UBRRn | Error |
+// +-----------------+-------+-------+-------+-------+
+// |            2400 |   416 | -0.1% |   832 |  0.0% |
+// |            4800 |   207 |  0.2% |   416 | -0.1% |
+// |            9600 |   103 |  0.2% |   207 |  0.2% |
+// |           14400 |    68 |  0.6% |   138 | -0.1% |
+// |           19200 |    51 |  0.2% |   103 |  0.2% |
+// |           28800 |    34 | -0.8% |    68 |  0.6% |
+// |           38400 |    25 |  0.2% |    51 |  0.2% |
+// |           57600 |    16 |  2.1% |    34 | -0.8% |
+// |           76800 |    12 |  0.2% |    25 |  0.2% |
+// |          115200 |     8 | -3.5% |    16 |  2.1% |
 
 #include "uart.h"
 #include <avr/io.h>
 #include <stdlib.h>
 
-/**
- * Method for setting up a UART
- *
- * @param BaudRate          The desired baudrate, should be between 110 and 115200, both inclusive
- * @param Parity            If using parity: E or e for even parity, o or O for odd parity, d or D for disabled,
- *                          rest will not setup anything
- * @param stop_bits         The amount of stop bits, 1 and 2 is supported, any other value will not set anything
- * @param character_size    The amount of characters send: 5-9 supported, any other will not set anything up
- * @param mode              Normal mode = 0, fast mode = 1
- */
+//***************************************************************
+// Macro Functions for Genericness								*
+//***************************************************************
 
-void initUART0(unsigned long BaudRate, char Parity, unsigned int stop_bits,
-               unsigned int character_size, unsigned char mode) {
-
-    if ((BaudRate >= 110) && (BaudRate <= 115200) && (character_size >= 5) && (character_size <= 9)) {
+#define OFFSET(NUM) ((NUM) == 3 ? 0x70 : 0x8 * (NUM))
+#define UCSR_A(NUM) (*(&UCSR0A + OFFSET(NUM)))
+#define UCSR_B(NUM) (*(&UCSR0B + OFFSET(NUM)))
+#define UCSR_C(NUM) (*(&UCSR0C + OFFSET(NUM)))
+#define UBRR_(NUM)  (*(&UBRR0 + OFFSET(NUM)))
+#define UBRR_L(NUM) (*(&UBRR0L + OFFSET(NUM)))
+#define UBRR_H(NUM) (*(&UBRR0H + OFFSET(NUM)))
+#define UDR_(NUM)   (*(&UDR0 + OFFSET(NUM)))
 
 
-        /*
-         * if (uart_number < 3) {
-            #define UCSRnA _SFR_MEM8(0xC0+(8*uart_number))
-            #define UCSRnB _SFR_MEM8(0xC1+(8*uart_number))
-            #define UCSRnC _SFR_MEM8(0xC2+(8*uart_number))
-        }
-         */
-        // UCSRnB - Control and status register B:
-        //  7           6       5       4       3        2       1      0
-        //| RXCIEn | TXIECn | UDRIEn | RXENn | TXENn | UCSZn2 | RXB8n | TXB8n |
+//***************************************************************
+// Static Function Declaration									*
+//***************************************************************
+static bool validateUartNumber(uint8_t uartNum);
+static bool validateBaudRate(uint32_t baudRate);
 
-        // 7-5 (begge inklusiv) bruges ved interrupt styret USART
-        // RXENn = 1: RX Enable - tænder for modtageren
-        // TXENn = 1: TX Enable - tænder for senderen
-        // Enable receiver and transmitter
-        UCSR0B |= (0b11 << 3);
-        // TXENn = 1: TX Enable - tænder for senderen
+static void enableTransmitterReceiver(uint8_t uartNum);
+static void setParity(uint8_t uartNum, char parity);
+static void setStopBits(uint8_t uartNum, uint8_t stopBits);
+static void setSynchronisationMode(uint8_t uartNum, char syncMode);
+static void setCharacterSize(uint8_t uartNum, uint8_t charSize);
+static void setSpeedMode(uint8_t uartNum, char mode);
+static void setBaudRate(uint8_t uartNum, uint32_t baudRate);
 
-        // UCSRnC - Control and status register C
-        //  7           6         5       4     3         2       1         0
-        //| UMSELn1 | UMSELn0 | UPMn1 | UPMn0 | USBSn | UCSZn1 | UCSZn0 | UCROLn |
+static char getSpeedMode(uint8_t uartNum);
 
-        // UPMn1    | UPMn0 |  Parity Mode
-        // 0        | 0     |   Disabled
-        // 0        | 1     |   Reserved
-        // 1        | 0     |   Enabled, Even Parity
-        // 1        | 1     |   Enabled, Odd Parity
+static bool readyToTransmit(uint8_t uartNum);
+static bool readyToReceive(uint8_t uartNum);
 
-        if (Parity == 'e' || Parity == 'E') {
-            UCSR0C |= 0b1 << 5;
-            UCSR0C &= ~(0b1 << 4);
-        } else if (Parity == 'o' || Parity == 'O') {
-            UCSR0C |= 0b11 << 4;
-        } else if (Parity == 'd' || Parity == 'D') {
-            UCSR0C &= ~(0b11 << 4);
-        } else {
-            return;
-        }
+//***************************************************************
+// Public Function Implementation								*
+//***************************************************************
+void initUart(uint8_t uartNum, uint32_t baudRate,
+              char parity, uint8_t stopBits,
+              uint8_t charSize, char mode)
+{
+    if(validateUartNumber(uartNum) == false)
+    {
+        return;
+    }
 
-        // USBSn: 0 = 1 stop bit; 1 = 2 stop bits
+    if(validateBaudRate(baudRate) == false)
+    {
+        return;
+    }
 
-        if (stop_bits == 1) {
-            UCSR0C &= ~(0b1 << 3);
-        } else if (stop_bits == 2) {
-            UCSR0C |= 0b1 << 3;
-        } else {
-            return;
-        }
-        // UMSELn1 = 0 og UMSELn0 = 0 => Async mode
-        UCSR0C &= ~(0b11 << 6);
-
-        // UCSZn2   | UCSZn1    | UCSZn0    | Character Size
-        // 0        |   0       |   0       |   5-bit
-        // 0        |   0       |   1       |   6-bit
-        // 0        |   1       |   0       |   7-bit
-        // 0        |   1       |   1       |   8-bit
-        // 1        |   1       |   1       |   9-bit
-        // Rest in between are reserved
-
-        if (character_size == 5) {
-            UCSR0B &= ~(0b1 << 2);
-            UCSR0C &= ~(0b11 << 1);
-        } else if (character_size == 6) {
-            UCSR0B &= ~(0b1 << 2);
-            UCSR0C &= ~(0b1 << 2);
-            UCSR0C |= 0b1 << 1;
-        } else if (character_size == 7) {
-            UCSR0B &= ~(0b1 << 2);
-            UCSR0C &= ~(0b1 << 1);
-            UCSR0C |= 0b1 << 2;
-        } else if (character_size == 8) {
-            UCSR0B &= ~(0b1 << 2);
-            UCSR0C |= 0b11 << 1;
-        } else if (character_size == 9) {
-            UCSR0B |= 0b1 << 2;
-            UCSR0C |= 0b11 << 1;
-        } else {
-            return;
-        }
+    enableTransmitterReceiver(uartNum);
+    setParity(uartNum, parity);
+    setStopBits(uartNum, stopBits);
+    setSynchronisationMode(uartNum, 'A');
+    setCharacterSize(uartNum, charSize);
+    setSpeedMode(uartNum, mode);
+    setBaudRate(uartNum, baudRate);
+}
 
 
-        // UCSRnA - Control and status register A:
-        //  7       6      5       4     3      2       1      0
-        //| RXCn | TXCn | UDREn | FEn | DORn | UPEn | U2Xn | MPCMn |
-        // Operating Mode   | Equation for calculating baud rate    | Equation for calculating UBRR Value
-        // Aync normal mode | BAUD = f_{osc}/(16*(UBRRn + 1))         | UBRRn = (f_{osc}/(16*BAUD))-1
-        // U2Xn = 0         |
-        // -----------------------------------------------------------------------------------------------
-        // Async double     | BAUD = f_{osc}/(8*(UBRRn+1))          | UBRRn = (f_{osc}/(8*BAUD))-1
-        // speed mode       |
-        // U2Xn = 1
+bool isCharReceived(uint8_t uartNum)
+{
+    if(validateUartNumber(uartNum) == false)
+    {
+        return false;
+    }
 
-        if (mode == 0) { // Normal mode
-            UCSR0A &= ~(0b1 << 1);
-            UBRR0 = (uint16_t) ((8*BaudRate + F_CPU)/(16*BaudRate) - 1);
-        } else if (mode == 1) { // Double speed
-            UCSR0A |= 0b1 << 1;
-            UBRR0 = (uint16_t) ((F_CPU)/(8*BaudRate) - 1);
-        } else {
-            return;
-        }
+    if((UCSR_A(uartNum) & 0b10000000) == 0b10000000)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
 
+void sendChar(uint8_t uartNum, char character)
+{
+    if(validateUartNumber(uartNum) == false)
+    {
+        return;
+    }
 
-uint8_t charReady() {
-    // UCSRnA - Control and status register A:
-    //  7       6      5       4     3      2       1      0
-    //| RXCn | TXCn | UDREn | FEn | DORn | UPEn | U2Xn | MPCMn |
+    while(readyToTransmit(uartNum) == false)
+    {}
 
-    // Når RXCn er 1:   Nyt tegn modtaget og kan hentes i UDR
-    return (uint8_t) ((UCSR0A >> 7) & 0b1);
+    UDR_(uartNum) = (uint8_t)character;
 }
 
+char receiveChar(uint8_t uartNum)
+{
+    if(validateUartNumber(uartNum) == false)
+    {
+        return '\0';
+    }
 
-char readChar() {
-    while (charReady() == 0);
+    while(readyToReceive(uartNum) == false)
+    {}
 
-    // læsning af modtaget tegn => char x = UDRx;
-    return UDR0;
+    return UDR_(uartNum);
 }
-void sendChar(char Tegn) {
-    // Send tegn => char x = "a"; UDRx = x;
-    while ((UCSR0A & (0b1 << 5)) == 0);
 
-    UDR0 = Tegn;
-}
-void sendString(char *Streng) {
-    while (*Streng != '\0') {
-        sendChar(*Streng++);
+void sendString(uint8_t uartNum, char* string)
+{
+    if(validateUartNumber(uartNum) == false)
+    {
+        return;
+    }
+
+    while(*string != '\0')
+    {
+        sendChar(uartNum, *string);
+        string++;
     }
 }
-void sendInteger(int Tal) {
-    char buffer[8];
-    itoa(Tal, buffer, 10);
-    sendString(buffer);
+
+void sendInteger(uint8_t uartNum, int16_t value)
+{
+    if(validateUartNumber(uartNum) == false)
+    {
+        return;
+    }
+
+    char buffer[16];
+    itoa(value, buffer, 10);
+    sendString(uartNum, buffer);
+}
+
+
+//***************************************************************
+// Static Function Implementation								*
+//***************************************************************
+static bool validateUartNumber(uint8_t uartNum)
+{
+    if(0 <= uartNum && uartNum <= 3)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+static bool validateBaudRate(uint32_t baudRate)
+{
+    if(100 <= baudRate && baudRate <= 115200)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+static void enableTransmitterReceiver(uint8_t uartNum)
+{
+    UCSR_B(uartNum) |= 0b00011000;
+}
+
+static void setParity(uint8_t uartNum, char parity)
+{
+    if (parity == 'E' || parity == 'e')
+    {
+        UCSR_C(uartNum) |= 0b00100000;   // Even Parity
+        UCSR_C(uartNum) &= 0b11101111;
+    }
+    else if (parity == 'O' || parity == 'o')
+    {
+        UCSR_C(uartNum) |= 0b00110000;   // Odd Parity
+    }
+    else if (parity == 'D' || parity == 'd')
+    {
+        UCSR_C(uartNum) &= 0b11001111;   // Disabled Parity
+    }
+    else
+    {
+        return;
+    }
+}
+
+static void setStopBits(uint8_t uartNum, uint8_t stopBits)
+{
+    if (stopBits == 1)
+    {
+        UCSR_C(uartNum) &= 0b11110111;
+    }
+    else if (stopBits == 2)
+    {
+        UCSR_C(uartNum) |= 0b00001000;
+    }
+    else
+    {
+        return;
+    }
+}
+
+static void setSynchronisationMode(uint8_t uartNum, char syncMode)
+{
+    if(syncMode == 'A' || syncMode == 'a')
+    {
+        UCSR_C(uartNum) &= 0b00111111;
+    }
+    else if(syncMode == 'S' || syncMode == 's')
+    {
+        UCSR_C(uartNum) &= 0b01111111;
+        UCSR_C(uartNum) |= 0b01000000;
+    }
+    else
+    {
+        return;
+    }
+}
+
+static void setCharacterSize(uint8_t uartNum, uint8_t charSize)
+{
+    if (charSize == 5)
+    {
+        UCSR_B(uartNum) &= 0b11111011;
+        UCSR_C(uartNum) &= 0b11111001;
+    }
+    else if (charSize == 6)
+    {
+        UCSR_B(uartNum) &= 0b11111011;
+        UCSR_C(uartNum) &= 0b11111011;
+        UCSR_C(uartNum) |= 0b00000010;
+    }
+    else if (charSize == 7)
+    {
+        UCSR_B(uartNum) &= 0b11111011;
+        UCSR_C(uartNum) &= 0b11111101;
+        UCSR_C(uartNum) |= 0b00000100;
+    }
+    else if (charSize == 8)
+    {
+        UCSR_B(uartNum) &= 0b11111011;
+        UCSR_C(uartNum) |= 0b00000110;
+    }
+    else if (charSize == 9)
+    {
+        UCSR_B(uartNum) |= 0b00000100;
+        UCSR_C(uartNum) |= 0b00000110;
+    }
+    else
+    {
+        return;
+    }
+}
+
+static void setSpeedMode(uint8_t uartNum, char mode)
+{
+    if(mode == 'N' || mode == 'n')
+    {
+        UCSR_A(uartNum) &= 0b11111101;
+    }
+    else if(mode == 'F' || mode == 'f')
+    {
+        UCSR_A(uartNum) |= 0b00000010;
+    }
+    else
+    {
+        return;
+    }
+}
+
+// DELETE ME
+#define F_CPU 16000000
+
+
+
+static void setBaudRate(uint8_t uartNum, uint32_t baudRate)
+{
+    if(validateBaudRate(baudRate) == false)
+    {
+        return;
+    }
+
+	char speedMode = getSpeedMode(uartNum);
+	uint16_t UBRRValue = 0;
+
+    if(speedMode == 'N')
+    {
+        // Normal Speed Mode
+        UBRRValue = (((8 * baudRate + F_CPU) / (16 * baudRate)) - 1);
+    }
+    else if(speedMode == 'F')
+    {
+        // Fast Speed Mode
+        UBRRValue = (((4 * baudRate + F_CPU) / (8 * baudRate)) - 1);
+    }
+    else
+    {
+        return;
+    }
+
+	UBRR_H(uartNum) = (UBRRValue >> 8);
+	UBRR_L(uartNum) = UBRRValue;
+
+}
+
+static char getSpeedMode(uint8_t uartNum)
+{
+	if((UCSR_A(uartNum) & 0b00000010) == 0b00000010)
+	{
+		return 'F';
+	}
+	else
+	{
+		return 'N';
+	}
+}
+
+static bool readyToTransmit(uint8_t uartNum)
+{
+    if((UCSR_A(uartNum) & 0b00100000) == 0b00100000)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+static bool readyToReceive(uint8_t uartNum)
+{
+    if((UCSR_A(uartNum) & 0b10000000) == 0b10000000)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }

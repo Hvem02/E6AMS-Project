@@ -1,41 +1,63 @@
-//
-// Created by munk on 3/16/18.
-//
-
-#ifndef E4PRJ4_TRANSPORTER_UART_H
-#define E4PRJ4_TRANSPORTER_UART_H
+#ifndef UART_H
+#define UART_H
 
 #include <stdint-gcc.h>
-#include <avr/io.h>
+#include <stdbool.h>
 
-/****************************************
-* "uart.h":                             *
-* Header file for Mega2560 UART driver. *
-* Using UART 0.                         *
-* Henning Hargaard, 4/11 2015           *
- * Modified by munk on 3/16/18          *
-*****************************************/
+/**
+ * Method for setting up UART
+ *
+ * @param uartNum   Which UART is used: 0 - 3
+ * @param baudRate  Baudrate for the UART: 110 - 115200
+ * @param parity    Is parity used: 'E' for even, 'O' for odd and 'D' for disabled
+ * @param stopBits  Number of stopbits used: 1 - 2
+ * @param charSize  Size of characters: 5 - 9
+ * @param mode      Normal or fast mode: 'N' or 'F'
+ */
+void initUart(uint8_t uartNum, uint32_t baudRate,
+              char parity, uint8_t stopBits,
+              uint8_t charSize, char mode);
 
-//struct UART {
-//    volatile uint8_t UCSRnA;
-//    volatile uint8_t UCSRnB;
-//    volatile uint8_t UCSRnC;
-//    volatile uint8_t UDRn;
-//    volatile uint16_t UBRRn;
-//};
-//
-//struct UART UART0 = {UCSR0A, UCSR0B, UCSR0C, UDR0, UBRR0};
-//struct UART UART1 = {UCSR1A, UCSR1B, UCSR1C, UDR1, UBRR1};
-//struct UART UART2 = {UCSR2A, UCSR2B, UCSR2C, UDR2, UBRR2};
-//struct UART UART3 = {UCSR3A, UCSR3B, UCSR3C, UDR3, UBRR3};
+/**
+ *
+ * @param uartNum   Which UART is used: 0 - 3
+ * @return
+ */
+bool isCharReceived(uint8_t uartNum);
 
-void InitUART0(unsigned long BaudRate, char Parity,
-               unsigned int stop_bits, unsigned int character_size, unsigned char mode);
-uint8_t CharReady();
-char ReadChar();
-void SendChar(char Tegn);
-void SendString(char* Streng);
-void SendInteger(int Tal);
-/****************************************/
+/**
+ *
+ * @param uartNum   Which UART is used: 0 - 3
+ * @return
+ */
+char readChar(uint8_t uartNum);
 
-#endif //E4PRJ4_TRANSPORTER_UART_H
+/**
+ *
+ * @param uartNum   Which UART is used: 0 - 3
+ * @param character
+ */
+void sendChar(uint8_t uartNum, char character);
+
+/**
+ *
+ * @param uartNum   Which UART is used: 0 - 3
+ * @return
+ */
+char receiveChar(uint8_t uartNum);
+
+/**
+ *
+ * @param uartNum   Which UART is used: 0 - 3
+ * @param string
+ */
+void sendString(uint8_t uartNum, char* string);
+
+/**
+ *
+ * @param uartNum   Which UART is used: 0 - 3
+ * @param value
+ */
+void sendInteger(uint8_t uartNum, int16_t value);
+
+#endif //UART_H
