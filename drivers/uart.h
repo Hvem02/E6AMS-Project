@@ -5,9 +5,8 @@
 #include <stdbool.h>
 
 //***************************************************************
-// Defines and constants                                        *
+// Public Defines                                               *
 //***************************************************************
-
 #define UART_SUCCES             0
 #define UART_ERROR_UART_NUM     1
 #define UART_ERROR_PARITY       2
@@ -20,7 +19,9 @@
 #define UART_ERROR_TRANSMIT     9
 #define UART_ERROR_TIMEOUT      10
 
-
+//***************************************************************
+// Public Function Definitions                                  *
+//***************************************************************
 /**
  * Function for setting up UART
  *

@@ -73,11 +73,9 @@
 #include <stdlib.h>
 #include <util/delay.h>
 
-
 //***************************************************************
-// Macro Functions for Genericness								*
+// Macro Functions                                              *
 //***************************************************************
-
 #define OFFSET(NUM) ((NUM) == 3 ? 0x70 : 0x8 * (NUM))
 #define UCSR_A(NUM) (*(&UCSR0A + OFFSET(NUM)))
 #define UCSR_B(NUM) (*(&UCSR0B + OFFSET(NUM)))
@@ -98,7 +96,7 @@ do                                  \
 }while(0)                           \
 
 //***************************************************************
-// Static Function Declaration									*
+// Static Function Declaration                                  *
 //***************************************************************
 static uint8_t validateUartNumber(uint8_t uartNum);
 
@@ -113,7 +111,7 @@ static uint8_t setBaudRate(uint8_t uartNum, uint32_t baudRate);
 static char getSpeedMode(uint8_t uartNum);
 
 //***************************************************************
-// Public Function Implementation								*
+// Public Function Implementation                               *
 //***************************************************************
 uint8_t uartInit(uint8_t uartNum, uint32_t baudRate,
                  char parity, uint8_t stopBits,
@@ -227,7 +225,7 @@ uint8_t uartByteTransmitted(uint8_t uartNum)
 }
 
 //***************************************************************
-// Static Function Implementation								*
+// Static Function Implementation                               *
 //***************************************************************
 static uint8_t validateUartNumber(uint8_t uartNum)
 {
