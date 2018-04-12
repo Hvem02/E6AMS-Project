@@ -139,7 +139,7 @@ uint8_t uartSendByte(uint8_t uartNum, uint8_t value)
     return UART_SUCCES;
 }
 
-uint8_t uartSendByteArray(uint8_t uartNum, uint8_t* array, uint16_t size)
+uint8_t uartSendByteArray(uint8_t uartNum, uint8_t const * array, uint16_t size)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
     for(uint16_t i = 0; i < size; i++)
@@ -149,7 +149,7 @@ uint8_t uartSendByteArray(uint8_t uartNum, uint8_t* array, uint16_t size)
     return UART_SUCCES;
 }
 
-uint8_t uartSendString(uint8_t uartNum, char* string)
+uint8_t uartSendString(uint8_t uartNum, char const * string)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
     while(*string != '\0')

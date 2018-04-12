@@ -53,7 +53,7 @@ uint8_t uartSendByte(uint8_t uartNum, uint8_t value);
  * @param size      Size of
  * @return          Returns 0 on succes
  */
-uint8_t uartSendByteArray(uint8_t uartNum, uint8_t* array, uint16_t size);
+uint8_t uartSendByteArray(uint8_t uartNum, uint8_t const * array, uint16_t size);
 
 /**
  * Function for sending a null-terminated string
@@ -62,7 +62,7 @@ uint8_t uartSendByteArray(uint8_t uartNum, uint8_t* array, uint16_t size);
  * @param string    Null terminated string to be sendt
  * @return          Returns 0 on succes
  */
-uint8_t uartSendString(uint8_t uartNum, char* string);
+uint8_t uartSendString(uint8_t uartNum, char const * string);
 
 /**
  * Function for sending an integer formated as text
