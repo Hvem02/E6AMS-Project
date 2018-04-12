@@ -71,21 +71,7 @@
 #include "uart.h"
 #include <avr/io.h>
 #include <stdlib.h>
-
-//***************************************************************
-// Defines and constants                                        *
-//***************************************************************
-
-#define UART_SUCCES             0
-#define UART_ERROR_UART_NUM     1
-#define UART_ERROR_PARITY       2
-#define UART_ERROR_STOP_BITS    3
-#define UART_ERROR_SYNC_MODE    4
-#define UART_ERROR_CHAR_SIZE    5
-#define UART_ERROR_SPEED_MODE   6
-#define UART_ERROR_BAUDRATE     7
-#define UART_ERROR_RECEIVE      8
-#define UART_ERROR_TRANSMIT     9
+#include <util/delay.h>
 
 
 //***************************************************************
@@ -418,23 +404,21 @@ static char getSpeedMode(uint8_t uartNum)
 	}
 }
 
-/*
- * TODO Figure out if this function should be implemented
 // Same as readChar, but with timeout,
 // On on returned char after 10 ms it will return !
 //
 // @return
-char readCharWithDelay()
+uint8_t readCharWithDelay(uint8_t uartNum, uint8_t* retVal)
 {
     for (int i = 0; i < 10; ++i)
     {
-        if (charReady() == 1)
+        if (uartByteReceived(uartNum) == UART_SUCCES)
         {
-            return UDR0;
+            *retVal = UDR_(uartNum);
+            return UART_SUCCES;
         }
         // TODO Review this delay
         _delay_ms(1);
     }
-    return noReturn;
+    return UART_ERROR_TIMEOUT;
 }
-*/

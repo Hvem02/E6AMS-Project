@@ -45,26 +45,27 @@ bool sendWithResponse(const char* message, char* buffer) {
     int i = 0;
 
     while (1) {
-        char res = readCharWithDelay();
+        uint8_t response;
+        uint8_t success = readCharWithDelay(uartLC05, &response);
 
-        if (res == noReturn) {
+        if (success == UART_ERROR_TIMEOUT) {
             // Timeout error
             uartSendString(0, timeoutError);
             return false;
-        } else if (res == 'K' && i > 0) {
+        } else if (response == 'K' && i > 0) {
             // handle OK
             if (buffer[i-1] == 'O') {
                 // response OK !
                 return true;
             }
-        } else if (res == 'L' && i > 2) {
+        } else if (response == 'L' && i > 2) {
             if (buffer[i-3] == 'F' && buffer[i-2] == 'A' && buffer[i-1] == 'I') {
                 // response Failed !
                 return false;
             }
         }
 
-        buffer[i++] = res;
+        buffer[i++] = response;
     }
 }
 

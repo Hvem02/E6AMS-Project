@@ -4,6 +4,23 @@
 #include <stdint-gcc.h>
 #include <stdbool.h>
 
+//***************************************************************
+// Defines and constants                                        *
+//***************************************************************
+
+#define UART_SUCCES             0
+#define UART_ERROR_UART_NUM     1
+#define UART_ERROR_PARITY       2
+#define UART_ERROR_STOP_BITS    3
+#define UART_ERROR_SYNC_MODE    4
+#define UART_ERROR_CHAR_SIZE    5
+#define UART_ERROR_SPEED_MODE   6
+#define UART_ERROR_BAUDRATE     7
+#define UART_ERROR_RECEIVE      8
+#define UART_ERROR_TRANSMIT     9
+#define UART_ERROR_TIMEOUT      10
+
+
 /**
  * Function for setting up UART
  *
@@ -100,5 +117,8 @@ uint8_t uartByteReceived(uint8_t uartNum);
  * @return          Returns 0 on if byte is transmitted
  */
 uint8_t uartByteTransmitted(uint8_t uartNum);
+
+
+uint8_t readCharWithDelay(uint8_t uartNum, uint8_t* retVal);
 
 #endif //UART_H

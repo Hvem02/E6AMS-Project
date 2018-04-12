@@ -40,7 +40,7 @@ void writeErrorCodeToUser(char value);
 const char uartDebug = 0;
 const char uartLC05 = 1;
 
-const char* timeoutError = "I did not receive a char within the 10 ms timeout";
+const char* timeoutError = "I did not receive a char within the 10 ms timeout\r\n";
 
 // AT commands
 const char *atOK = "OK";
