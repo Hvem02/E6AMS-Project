@@ -118,7 +118,4 @@ uint8_t uartByteReceived(uint8_t uartNum);
  */
 uint8_t uartByteTransmitted(uint8_t uartNum);
 
-
-uint8_t readCharWithDelay(uint8_t uartNum, uint8_t* retVal);
-
 #endif //UART_H
