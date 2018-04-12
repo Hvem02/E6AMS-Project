@@ -128,6 +128,7 @@ uint8_t uartInit(uint8_t uartNum, uint32_t baudRate,
     RETURN_ON_ERROR(setCharacterSize(uartNum, charSize));
     RETURN_ON_ERROR(setSpeedMode(uartNum, mode));
     RETURN_ON_ERROR(setBaudRate(uartNum, baudRate));
+    return UART_SUCCES;
 }
 
 uint8_t uartSendByte(uint8_t uartNum, uint8_t value)
@@ -154,7 +155,7 @@ uint8_t uartSendString(uint8_t uartNum, char const * string)
     RETURN_ON_ERROR(validateUartNumber(uartNum));
     while(*string != '\0')
     {
-        uartSendByte(uartNum, *string);
+        uartSendByte(uartNum, (uint8_t)*string);
         string++;
     }
     return UART_SUCCES;
@@ -164,8 +165,8 @@ uint8_t uartSendInteger(uint8_t uartNum, int16_t value, uint8_t base)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
     uint8_t buffer[16 + 3];
-    itoa(value, buffer, base);
-    uartSendString(0, buffer);
+    itoa(value, (char*)buffer, base);
+    uartSendString(0, (char*)buffer);
     return UART_SUCCES;
 }
 
@@ -194,7 +195,7 @@ uint8_t uartReceiveString(uint8_t uartNum, char* string)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
 
-    char c = 0;
+    uint8_t c = 0;
     RETURN_ON_ERROR(uartReceiveByte(uartNum, &c));
     while(c != '\0')
     {
@@ -208,7 +209,7 @@ uint8_t uartReceiveString(uint8_t uartNum, char* string)
 uint8_t uartByteReceived(uint8_t uartNum)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
-    if((UCSR_A(uartNum) & 0b10000000) != 0b10000000)
+    if((UCSR_A(uartNum) & 0b10000000u) != 0b10000000)
     {
         return UART_ERROR_RECEIVE;
     }
@@ -218,7 +219,7 @@ uint8_t uartByteReceived(uint8_t uartNum)
 uint8_t uartByteTransmitted(uint8_t uartNum)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
-    if((UCSR_A(uartNum) & 0b00100000) != 0b00100000)
+    if((UCSR_A(uartNum) & 0b00100000u) != 0b00100000)
     {
         return UART_ERROR_TRANSMIT;
     }
@@ -230,7 +231,7 @@ uint8_t uartByteTransmitted(uint8_t uartNum)
 //***************************************************************
 static uint8_t validateUartNumber(uint8_t uartNum)
 {
-    if(0 <= uartNum && uartNum <= 3)
+    if(uartNum <= 3)
     {
         return UART_SUCCES;
     }
@@ -386,7 +387,7 @@ static uint8_t setBaudRate(uint8_t uartNum, uint32_t baudRate)
         return UART_ERROR_BAUDRATE;
     }
 
-	UBRR_H(uartNum) = (uint8_t)(UBRRValue >> 8);
+	UBRR_H(uartNum) = (uint8_t)(UBRRValue >> 8u);
 	UBRR_L(uartNum) = (uint8_t)(UBRRValue);
 
     return UART_SUCCES;
@@ -394,7 +395,7 @@ static uint8_t setBaudRate(uint8_t uartNum, uint32_t baudRate)
 
 static char getSpeedMode(uint8_t uartNum)
 {
-	if((UCSR_A(uartNum) & 0b00000010) == 0b00000010)
+	if((UCSR_A(uartNum) & 0b00000010u) == 0b00000010)
 	{
 		return 'F';
 	}
