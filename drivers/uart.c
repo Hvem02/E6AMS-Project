@@ -71,7 +71,6 @@
 #include "uart.h"
 #include <avr/io.h>
 #include <stdlib.h>
-#include <util/delay.h>
 
 //***************************************************************
 // Defines and constants                                        *
@@ -85,8 +84,8 @@
 #define UART_ERROR_CHAR_SIZE    5
 #define UART_ERROR_SPEED_MODE   6
 #define UART_ERROR_BAUDRATE     7
-
-#define UART_ERROR_UNDEFINED    69
+#define UART_ERROR_RECEIVE      8
+#define UART_ERROR_TRANSMIT     9
 
 
 //***************************************************************
@@ -102,12 +101,20 @@
 #define UBRR_H(NUM) (*(&UBRR0H + OFFSET(NUM)))
 #define UDR_(NUM)   (*(&UDR0 + OFFSET(NUM)))
 
+#define RETURN_ON_ERROR(EXPRESSION) \
+do                                  \
+{                                   \
+    uint8_t retVal = (EXPRESSION);  \
+    if(retVal != UART_SUCCES)       \
+    {                               \
+        return retVal;              \
+    }                               \
+}while(0)                           \
 
 //***************************************************************
 // Static Function Declaration									*
 //***************************************************************
-static bool validateUartNumber(uint8_t uartNum);
-static bool validateBaudRate(uint32_t baudRate);
+static uint8_t validateUartNumber(uint8_t uartNum);
 
 static uint8_t enableTransmitterReceiver(uint8_t uartNum);
 static uint8_t setParity(uint8_t uartNum, char parity);
@@ -119,130 +126,131 @@ static uint8_t setBaudRate(uint8_t uartNum, uint32_t baudRate);
 
 static char getSpeedMode(uint8_t uartNum);
 
-static bool readyToTransmit(uint8_t uartNum);
-static bool readyToReceive(uint8_t uartNum);
-
 //***************************************************************
 // Public Function Implementation								*
 //***************************************************************
-uint8_t initUart(uint8_t uartNum, uint32_t baudRate,
+uint8_t uartInit(uint8_t uartNum, uint32_t baudRate,
                  char parity, uint8_t stopBits,
                  uint8_t charSize, char mode)
 {
-    if(validateUartNumber(uartNum) == false)
-    {
-        return UART_ERROR_UART_NUM;
-    }
+    RETURN_ON_ERROR(validateUartNumber(uartNum));
 
-    if(validateBaudRate(baudRate) == false)
-    {
-        return UART_ERROR_BAUDRATE;
-    }
-
-    enableTransmitterReceiver(uartNum);
-    setParity(uartNum, parity);
-    setStopBits(uartNum, stopBits);
-    setSynchronisationMode(uartNum, 'A');
-    setCharacterSize(uartNum, charSize);
-    setSpeedMode(uartNum, mode);
-    setBaudRate(uartNum, baudRate);
+    RETURN_ON_ERROR(enableTransmitterReceiver(uartNum));
+    RETURN_ON_ERROR(setParity(uartNum, parity));
+    RETURN_ON_ERROR(setStopBits(uartNum, stopBits));
+    RETURN_ON_ERROR(setSynchronisationMode(uartNum, 'A'));
+    RETURN_ON_ERROR(setCharacterSize(uartNum, charSize));
+    RETURN_ON_ERROR(setSpeedMode(uartNum, mode));
+    RETURN_ON_ERROR(setBaudRate(uartNum, baudRate));
 }
 
-
-bool isCharReceived(uint8_t uartNum)
+uint8_t uartSendByte(uint8_t uartNum, uint8_t value)
 {
-    if(validateUartNumber(uartNum) == false)
-    {
-        return false;
-    }
-
-    if((UCSR_A(uartNum) & 0b10000000) == 0b10000000)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-void sendChar(uint8_t uartNum, char character)
-{
-    if(validateUartNumber(uartNum) == false)
-    {
-        return;
-    }
-
-    while(readyToTransmit(uartNum) == false)
+    RETURN_ON_ERROR(validateUartNumber(uartNum));
+    while(uartByteTransmitted(uartNum) != 0);
     {}
-
-    UDR_(uartNum) = (uint8_t)character;
+    UDR_(uartNum) = value;
+    return UART_SUCCES;
 }
 
-char receiveChar(uint8_t uartNum)
+uint8_t uartSendByteArray(uint8_t uartNum, uint8_t* array, uint16_t size)
 {
-    if(validateUartNumber(uartNum) == false)
+    RETURN_ON_ERROR(validateUartNumber(uartNum));
+    for(uint16_t i = 0; i < size; i++)
     {
-        return '\0';
+        uartSendByte(uartNum, array[i]);
     }
-
-    while(readyToReceive(uartNum) == false)
-    {}
-
-    return UDR_(uartNum);
+    return UART_SUCCES;
 }
 
-void sendString(uint8_t uartNum, char* string)
+uint8_t uartSendString(uint8_t uartNum, char* string)
 {
-    if(validateUartNumber(uartNum) == false)
-    {
-        return;
-    }
-
+    RETURN_ON_ERROR(validateUartNumber(uartNum));
     while(*string != '\0')
     {
-        sendChar(uartNum, *string);
+        uartSendByte(uartNum, *string);
         string++;
     }
+    return UART_SUCCES;
 }
 
-void sendInteger(uint8_t uartNum, int16_t value)
+uint8_t uartSendInteger(uint8_t uartNum, int16_t value, uint8_t base)
 {
-    if(validateUartNumber(uartNum) == false)
+    RETURN_ON_ERROR(validateUartNumber(uartNum));
+    uint8_t buffer[16 + 3];
+    itoa(value, buffer, base);
+    uartSendString(0, buffer);
+    return UART_SUCCES;
+}
+
+uint8_t uartReceiveByte(uint8_t uartNum, uint8_t* value)
+{
+    RETURN_ON_ERROR(validateUartNumber(uartNum));
+    while(uartByteReceived(uartNum) != 0)
+    {}
+    (*value) =  UDR_(uartNum);
+    return UART_SUCCES;
+}
+
+uint8_t  uartReceiveByteArray(uint8_t uartNum, uint8_t* value, uint16_t size)
+{
+    RETURN_ON_ERROR(validateUartNumber(uartNum));
+
+    for(uint16_t i = 0; i < size; i++)
     {
-        return;
+        RETURN_ON_ERROR(uartReceiveByte(uartNum, (value + i)));
     }
 
-    char buffer[16];
-    itoa(value, buffer, 10);
-    sendString(uartNum, buffer);
+    return UART_SUCCES;
 }
 
+uint8_t uartReceiveString(uint8_t uartNum, char* string)
+{
+    RETURN_ON_ERROR(validateUartNumber(uartNum));
+
+    char c = 0;
+    RETURN_ON_ERROR(uartReceiveByte(uartNum, &c));
+    while(c != '\0')
+    {
+        *string = c;
+        string++;
+        RETURN_ON_ERROR(uartReceiveByte(uartNum, &c));
+    }
+    return UART_SUCCES;
+}
+
+uint8_t uartByteReceived(uint8_t uartNum)
+{
+    RETURN_ON_ERROR(validateUartNumber(uartNum));
+    if((UCSR_A(uartNum) & 0b10000000) != 0b10000000)
+    {
+        return UART_ERROR_RECEIVE;
+    }
+    return UART_SUCCES;
+}
+
+uint8_t uartByteTransmitted(uint8_t uartNum)
+{
+    RETURN_ON_ERROR(validateUartNumber(uartNum));
+    if((UCSR_A(uartNum) & 0b00100000) != 0b00100000)
+    {
+        return UART_ERROR_TRANSMIT;
+    }
+    return UART_SUCCES;
+}
 
 //***************************************************************
 // Static Function Implementation								*
 //***************************************************************
-static bool validateUartNumber(uint8_t uartNum)
+static uint8_t validateUartNumber(uint8_t uartNum)
 {
     if(0 <= uartNum && uartNum <= 3)
     {
-        return true;
+        return UART_SUCCES;
     }
     else
     {
-        return false;
-    }
-}
-
-static bool validateBaudRate(uint32_t baudRate)
-{
-    if(100 <= baudRate && baudRate <= 115200)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
+        return UART_ERROR_UART_NUM;
     }
 }
 
@@ -271,6 +279,8 @@ static uint8_t setParity(uint8_t uartNum, char parity)
     {
         return UART_ERROR_PARITY;
     }
+
+    return UART_SUCCES;
 }
 
 static uint8_t setStopBits(uint8_t uartNum, uint8_t stopBits)
@@ -287,6 +297,8 @@ static uint8_t setStopBits(uint8_t uartNum, uint8_t stopBits)
     {
         return UART_ERROR_STOP_BITS;
     }
+
+    return UART_SUCCES;
 }
 
 static uint8_t setSynchronisationMode(uint8_t uartNum, char syncMode)
@@ -304,6 +316,8 @@ static uint8_t setSynchronisationMode(uint8_t uartNum, char syncMode)
     {
         return UART_ERROR_SYNC_MODE;
     }
+
+    return UART_SUCCES;
 }
 
 static uint8_t setCharacterSize(uint8_t uartNum, uint8_t charSize)
@@ -339,6 +353,8 @@ static uint8_t setCharacterSize(uint8_t uartNum, uint8_t charSize)
     {
         return UART_ERROR_CHAR_SIZE;
     }
+
+    return UART_SUCCES;
 }
 
 static uint8_t setSpeedMode(uint8_t uartNum, char mode)
@@ -355,13 +371,15 @@ static uint8_t setSpeedMode(uint8_t uartNum, char mode)
     {
         return UART_ERROR_SPEED_MODE;
     }
+
+    return UART_SUCCES;
 }
 
 static uint8_t setBaudRate(uint8_t uartNum, uint32_t baudRate)
 {
-    if(validateBaudRate(baudRate) == false)
+    if(baudRate < 100 || 115200 < baudRate)
     {
-        return;
+        return UART_ERROR_BAUDRATE;
     }
 
 	char speedMode = getSpeedMode(uartNum);
@@ -370,21 +388,22 @@ static uint8_t setBaudRate(uint8_t uartNum, uint32_t baudRate)
     if(speedMode == 'N')
     {
         // Normal Speed Mode
-        UBRRValue = (((8 * baudRate + F_CPU) / (16 * baudRate)) - 1);
+        UBRRValue = (uint16_t )(((8 * baudRate + F_CPU) / (16 * baudRate)) - 1);
     }
     else if(speedMode == 'F')
     {
         // Fast Speed Mode
-        UBRRValue = (((4 * baudRate + F_CPU) / (8 * baudRate)) - 1);
+        UBRRValue = (uint16_t )(((4 * baudRate + F_CPU) / (8 * baudRate)) - 1);
     }
     else
     {
         return UART_ERROR_BAUDRATE;
     }
 
-	UBRR_H(uartNum) = (UBRRValue >> 8);
-	UBRR_L(uartNum) = UBRRValue;
+	UBRR_H(uartNum) = (uint8_t)(UBRRValue >> 8);
+	UBRR_L(uartNum) = (uint8_t)(UBRRValue);
 
+    return UART_SUCCES;
 }
 
 static char getSpeedMode(uint8_t uartNum)
@@ -399,36 +418,18 @@ static char getSpeedMode(uint8_t uartNum)
 	}
 }
 
-static bool readyToTransmit(uint8_t uartNum)
+/*
+ * TODO Figure out if this function should be implemented
+// Same as readChar, but with timeout,
+// On on returned char after 10 ms it will return !
+//
+// @return
+char readCharWithDelay()
 {
-    if((UCSR_A(uartNum) & 0b00100000) == 0b00100000)
+    for (int i = 0; i < 10; ++i)
     {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-static bool readyToReceive(uint8_t uartNum) {
-    if ((UCSR_A(uartNum) & 0b10000000) == 0b10000000) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-
-/**
- * Same as readChar, but with timeout,
- * On on returned char after 10 ms it will return !
- *
- * @return
- */
-char readCharWithDelay() {
-    for (int i = 0; i < 10; ++i) {
-        if (charReady() == 1) {
+        if (charReady() == 1)
+        {
             return UDR0;
         }
         // TODO Review this delay
@@ -436,4 +437,4 @@ char readCharWithDelay() {
     }
     return noReturn;
 }
-
+*/

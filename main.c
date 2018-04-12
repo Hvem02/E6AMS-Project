@@ -27,6 +27,7 @@
 
 #include <avr/io.h>
 #include <util/delay.h>
+#include "drivers/uart.h"
 
 #include "libs/lc-05.h"
 #include "libs/uart.h"
@@ -46,5 +47,10 @@ int main()
     while(1)
     {
         _delay_ms(1000);
+        uint8_t c[3] = {0};
+        uartReceiveByteArray(0, c, 3);
+        uartSendByteArray(0, c, 3);
+
+        _delay_ms(10);
     }
 }
