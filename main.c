@@ -28,19 +28,20 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include "drivers/uart.h"
-#include "drivers/lc-05.h"
 
+#include "libs/lc-05.h"
+#include "libs/uart.h"
 
 int main()
 {
-    uartInit(0, 115200, 'O', 1, 8, 'N');
+    initUart(0, 115200, 'O', 1, 8, 'N');
     initLC05();
 
     char versionBuffer[100] = {0};
 
     lc05Version(versionBuffer);
 
-    uartSendString(0, versionBuffer);
+    sendString(0, versionBuffer);
 
 
     while(1)
