@@ -27,15 +27,24 @@
 
 #include <avr/io.h>
 #include <util/delay.h>
+
+#include "libs/lc-05.h"
 #include "libs/uart.h"
 
 int main()
 {
     initUart(0, 115200, 'O', 1, 8, 'N');
+    initLC05();
+
+    char versionBuffer[100] = {0};
+
+    lc05Version(versionBuffer);
+
+    sendString(0, versionBuffer);
+
 
     while(1)
     {
-        sendChar(0, 'A');
         _delay_ms(1000);
     }
 }
