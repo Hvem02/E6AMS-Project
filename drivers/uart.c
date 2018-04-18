@@ -156,6 +156,7 @@ uint8_t uartSendString(uint8_t uartNum, char const * string)
         uartSendByte(uartNum, (uint8_t)*string);
         string++;
     }
+    uartSendByte(uartNum, '\0');
     return UART_SUCCES;
 }
 
