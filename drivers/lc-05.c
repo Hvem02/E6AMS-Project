@@ -126,6 +126,6 @@ bool sendWithResponse(const char* message, char* buffer) {
     }
 }
 
-void writeErrorCodeToUser(char value) {
+void writeErrorCodeToUser(uint8_t value) {
     uartSendString(uartDebug, errorCodes[value]);
 }

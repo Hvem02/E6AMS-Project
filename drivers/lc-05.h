@@ -35,7 +35,7 @@ void lc05Version(char* versionBuffer);
 
 bool sendWithResponse(const char *message, char* buffer);
 
-void writeErrorCodeToUser(char value);
+void writeErrorCodeToUser(uint8_t value);
 
 uint8_t readCharWithDelay(uint8_t uartNum, uint8_t* retVal);
 
