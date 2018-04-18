@@ -7,11 +7,12 @@
 
 const char uartDebug = 0;
 const char uartLC05 = 1;
-const uint16_t uartLC05BAUD = 9600;
+const uint32_t uartLC05BAUD = 115200;
 
 const char* timeoutError = "I did not receive a char within the 10 ms timeout\r\n";
 
 // AT commands
+const char* atEnd = "\r\n";
 const char* atOK = "OK";
 const char* atFail = "FAIL";
 const char* atTest = "AT";
@@ -91,18 +92,22 @@ void lc05Version(char* versionBuffer) {
 
 
 bool sendWithResponse(const char* message, char* buffer) {
-    char at_send_string[strlen(message)+2];
-    strcat(at_send_string, "\r\n");
-    uartSendString(uartLC05, at_send_string);
+
+    uartSendString(uartDebug, "Sending the following:");
+    uartSendString(uartDebug, message);
+    uartSendString(uartDebug, atEnd);
+    uartSendString(uartLC05, message);
+    uartSendString(uartLC05, atEnd);
     int i = 0;
 
     while (1) {
         uint8_t response;
-        uint8_t success = readCharWithDelay(uartLC05, &response);
+//        uint8_t success = readCharWithDelay(uartLC05, &response);
+        uint8_t success = uartReceiveByte(uartLC05, &response);
 
         if (success == UART_ERROR_TIMEOUT) {
             // Timeout error
-            uartSendString(0, timeoutError);
+            uartSendString(uartDebug, timeoutError);
             return false;
         } else if (response == 'K' && i > 0) {
             // handle OK
