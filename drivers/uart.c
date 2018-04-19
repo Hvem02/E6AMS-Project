@@ -155,6 +155,7 @@ uint8_t uartSendString(uint8_t uartNum, char const * string)
         uartSendByte(uartNum, (uint8_t)*string);
         string++;
     }
+    uartSendByte(uartNum, '\0');
     return UART_SUCCES;
 }
 
@@ -193,13 +194,13 @@ uint8_t uartReceiveString(uint8_t uartNum, char* string)
     RETURN_ON_ERROR(validateUartNumber(uartNum));
 
     uint8_t c = 0;
-    RETURN_ON_ERROR(uartReceiveByte(uartNum, &c));
-    while(c != '\0')
+    do
     {
+        RETURN_ON_ERROR(uartReceiveByte(uartNum, &c));
         *string = c;
         string++;
-        RETURN_ON_ERROR(uartReceiveByte(uartNum, &c));
     }
+    while(c != '\0');
     return UART_SUCCES;
 }
 
