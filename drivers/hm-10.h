@@ -2,6 +2,7 @@
 #define HM_10_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 //***************************************************************
 // Public Defines                                               *
@@ -23,5 +24,8 @@ void hm10Init(void);
  */
 uint8_t hm10Test(void);
 
+bool sendWithResponse(const char* message, char* buffer);
+
+bool hm10Ready();
 
 #endif // MH_10_H

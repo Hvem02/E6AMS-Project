@@ -133,7 +133,6 @@ uint8_t uartSendByte(uint8_t uartNum, uint8_t value)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
     while(uartByteTransmitted(uartNum) != 0);
-    {}
     UDR_(uartNum) = value;
     return UART_SUCCES;
 }
