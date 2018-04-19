@@ -172,9 +172,8 @@ uint8_t uartSendInteger(uint8_t uartNum, int16_t value, uint8_t base)
 uint8_t uartReceiveByte(uint8_t uartNum, uint8_t* value)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
-    while(uartByteReceived(uartNum) != 0)
-    {}
-    (*value) =  UDR_(uartNum);
+    RETURN_ON_ERROR(uartByteReceived(uartNum));
+    (*value) = UDR_(uartNum);
     return UART_SUCCES;
 }
 
@@ -193,7 +192,6 @@ uint8_t  uartReceiveByteArray(uint8_t uartNum, uint8_t* value, uint16_t size)
 uint8_t uartReceiveString(uint8_t uartNum, char* string)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
-
     uint8_t c = 0;
     do
     {

@@ -76,7 +76,8 @@ uint8_t uartSendString(uint8_t uartNum, char const * string);
 uint8_t uartSendInteger(uint8_t uartNum, int16_t value, uint8_t base);
 
 /**
- * Function for receiving a single byte
+ * Function for receiving a single byte.
+ * This function is non-blocking and will return error if a byte is not received.
  *
  * @param uartNum   Which UART is used: 0 - 3
  * @param value     Pointer to variable to hold received character

@@ -53,3 +53,4 @@ dkms.conf
 
 # Repo specific folders and files
 .idea/
+cmake-build-debug/
