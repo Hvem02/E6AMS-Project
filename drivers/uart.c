@@ -155,7 +155,7 @@ uint8_t uartSendString(uint8_t uartNum, char const * string)
         uartSendByte(uartNum, (uint8_t)*string);
         string++;
     }
-    uartSendByte(uartNum, '\0');
+//    uartSendByte(uartNum, '\0');
     return UART_SUCCES;
 }
 
@@ -407,7 +407,7 @@ static char getSpeedMode(uint8_t uartNum)
 // @return
 uint8_t readCharWithDelay(uint8_t uartNum, uint8_t* retVal)
 {
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 2000; ++i)
     {
         if (uartByteReceived(uartNum) == UART_SUCCES)
         {
@@ -415,7 +415,8 @@ uint8_t readCharWithDelay(uint8_t uartNum, uint8_t* retVal)
             return UART_SUCCES;
         }
         // TODO Review this delay
-        _delay_ms(1);
+        _delay_us(100);
+//        _delay_ms(1);
     }
     return UART_ERROR_TIMEOUT;
 }

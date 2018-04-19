@@ -120,4 +120,13 @@ uint8_t uartByteReceived(uint8_t uartNum);
  */
 uint8_t uartByteTransmitted(uint8_t uartNum);
 
+/**
+ * Function for reading char non blocking
+ *
+ * @param uartNum   The uart 0 - 3
+ * @param retVal    Where it will be stored
+ * @return          UART_SUCCES on success UART_ERROR_TIMEOUT on error
+ */
+uint8_t readCharWithDelay(uint8_t uartNum, uint8_t* retVal);
+
 #endif //UART_H

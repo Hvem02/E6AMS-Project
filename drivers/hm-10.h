@@ -18,14 +18,22 @@
  */
 void hm10Init(void);
 
-/**
- *
- * @return
- */
-uint8_t hm10Test(void);
 
+/**
+ * Method for sending message over uart1, with response set in buffer.
+ *
+ *
+ * @param message   The message to send
+ * @param buffer    The buffer for the response, should large enough for the response
+ * @return          True if the response is a substring of OK, false if not (hence probably FAILED as response)
+ */
 bool sendWithResponse(const char* message, char* buffer);
 
+/**
+ * Called for checking if we can talk with the hm10 module.
+ *
+ * @return true if the AT command returned OK (or a substring of), else false
+ */
 bool hm10Ready();
 
 #endif // MH_10_H
