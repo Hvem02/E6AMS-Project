@@ -36,4 +36,13 @@ bool sendWithResponse(const char* message, char* buffer);
  */
 bool hm10Ready();
 
+/**
+ * Function for reading char from uart but will return error if no value is read.
+ *
+ * @param uartNum   Uart being used
+ * @param retVal    Pointer to value to be returned
+ * @return          UART return values
+ */
+uint8_t readCharWithDelay(uint8_t uartNum, uint8_t* retVal);
+
 #endif // MH_10_H
