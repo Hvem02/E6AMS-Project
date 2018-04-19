@@ -398,22 +398,3 @@ static char getSpeedMode(uint8_t uartNum)
 		return 'N';
 	}
 }
-
-// Same as readChar, but with timeout,
-// On on returned char after 10 ms it will return !
-//
-// @return
-uint8_t readCharWithDelay(uint8_t uartNum, uint8_t* retVal)
-{
-    for (int i = 0; i < 10; ++i)
-    {
-        if (uartByteReceived(uartNum) == UART_SUCCES)
-        {
-            *retVal = UDR_(uartNum);
-            return UART_SUCCES;
-        }
-        // TODO Review this delay
-        _delay_ms(1);
-    }
-    return UART_ERROR_TIMEOUT;
-}
