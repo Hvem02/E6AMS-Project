@@ -102,10 +102,11 @@ do                                  \
 static uint8_t validateUartNumber(uint8_t uartNum);
 
 static uint8_t enableTransmitterReceiver(uint8_t uartNum);
-static char getParity(uint8_t uartNum, char* retVal);
+static uint8_t getParity(uint8_t uartNum, char* retVal);
 static uint8_t setParity(uint8_t uartNum, char parity);
 static uint8_t getStopBits(uint8_t uartNum, uint8_t* retVal);
 static uint8_t setStopBits(uint8_t uartNum, uint8_t stopBits);
+static uint8_t getSynchronisationMode(uint8_t uartNum, char* syncMode);
 static uint8_t setSynchronisationMode(uint8_t uartNum, char syncMode);
 static uint8_t setCharacterSize(uint8_t uartNum, uint8_t charSize);
 static char getSpeedMode(uint8_t uartNum);
@@ -243,7 +244,7 @@ static uint8_t enableTransmitterReceiver(uint8_t uartNum)
     return UART_SUCCES;
 }
 
-static char getParity(uint8_t uartNum, char* retVal)
+static uint8_t getParity(uint8_t uartNum, char* retVal)
 {
     if(((UCSR_C(uartNum) & 0b00100000u) == 0b00100000) &&
        ((UCSR_C(uartNum) | 0b11101111u) == 0b11101111))
@@ -323,6 +324,24 @@ static uint8_t setStopBits(uint8_t uartNum, uint8_t stopBits)
     return UART_SUCCES;
 }
 
+static uint8_t getSynchronisationMode(uint8_t uartNum, char* syncMode)
+{
+    if((UCSR_C(uartNum) | 0b00111111u) == 0b00111111)
+    {
+        *syncMode = 'A';
+    }
+    else if(((UCSR_C(uartNum) | 0b01111111u) == 0b01111111) &&
+            ((UCSR_C(uartNum) & 0b01000000u) == 0b01000000))
+    {
+        *syncMode = 'S';
+    }
+    else
+    {
+        return UART_ERROR_SYNC_MODE;
+    }
+    return UART_SUCCES;
+}
+
 static uint8_t setSynchronisationMode(uint8_t uartNum, char syncMode)
 {
     if(syncMode == 'A' || syncMode == 'a')
@@ -338,7 +357,6 @@ static uint8_t setSynchronisationMode(uint8_t uartNum, char syncMode)
     {
         return UART_ERROR_SYNC_MODE;
     }
-
     return UART_SUCCES;
 }
 
