@@ -28,7 +28,6 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-#include "drivers/lc-05.h"
 #include "drivers/uart.h"
 #include "drivers/hm-10.h"
 
@@ -37,10 +36,6 @@ int main()
     uartInit(0, 115200, 'O', 1, 8, 'N');
     hm10Init();
 
-    char versionBuffer[100] = {0};
-
-    uartSendString(0, versionBuffer);
-
 
     while(1)
     {
@@ -48,7 +43,7 @@ int main()
         uint8_t c[3] = {0};
         uartReceiveByteArray(0, c, 3);
         uartSendByteArray(0, c, 3);
-
+        hm10Ready();
         _delay_ms(10);
     }
 }
