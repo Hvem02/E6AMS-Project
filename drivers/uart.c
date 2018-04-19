@@ -72,6 +72,7 @@
 #include <avr/io.h>
 #include <stdlib.h>
 #include <util/delay.h>
+#include <avr/interrupt.h>
 
 //***************************************************************
 // Macro Functions                                              *
@@ -101,8 +102,9 @@ do                                  \
 static uint8_t validateUartNumber(uint8_t uartNum);
 
 static uint8_t enableTransmitterReceiver(uint8_t uartNum);
-static char getParity(uint8_t uartNum);
+static char getParity(uint8_t uartNum, char* retVal);
 static uint8_t setParity(uint8_t uartNum, char parity);
+static uint8_t getStopBits(uint8_t uartNum, uint8_t* retVal);
 static uint8_t setStopBits(uint8_t uartNum, uint8_t stopBits);
 static uint8_t setSynchronisationMode(uint8_t uartNum, char syncMode);
 static uint8_t setCharacterSize(uint8_t uartNum, uint8_t charSize);
@@ -241,25 +243,26 @@ static uint8_t enableTransmitterReceiver(uint8_t uartNum)
     return UART_SUCCES;
 }
 
-static char getParity(uint8_t uartNum)
+static char getParity(uint8_t uartNum, char* retVal)
 {
     if(((UCSR_C(uartNum) & 0b00100000u) == 0b00100000) &&
        ((UCSR_C(uartNum) | 0b11101111u) == 0b11101111))
     {
-        return 'E';
+        *retVal = 'E';
     }
     else if((UCSR_C(uartNum) & 0b00110000u) == 0b00110000)
     {
-        return 'O';
+        *retVal = 'O';
     }
     else if((UCSR_C(uartNum) | 0b11001111u) == 0b11001111)
     {
-        return 'D';
+        *retVal = 'D';
     }
     else
     {
-        return 0;
+        return UART_ERROR_PARITY;
     }
+    return UART_SUCCES;
 }
 
 static uint8_t setParity(uint8_t uartNum, char parity)
@@ -282,6 +285,23 @@ static uint8_t setParity(uint8_t uartNum, char parity)
         return UART_ERROR_PARITY;
     }
 
+    return UART_SUCCES;
+}
+
+static uint8_t getStopBits(uint8_t uartNum, uint8_t* retVal)
+{
+    if((UCSR_C(uartNum) | 0b11110111u) == 0b11110111)
+    {
+        *retVal = 1;
+    }
+    else if((UCSR_C(uartNum) & 0b00001000u) == 0b00001000)
+    {
+        *retVal = 2;
+    }
+    else
+    {
+        return UART_ERROR_STOP_BITS;
+    }
     return UART_SUCCES;
 }
 
