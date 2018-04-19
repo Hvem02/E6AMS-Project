@@ -179,12 +179,10 @@ uint8_t uartReceiveByte(uint8_t uartNum, uint8_t* value)
 uint8_t  uartReceiveByteArray(uint8_t uartNum, uint8_t* value, uint16_t size)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
-
     for(uint16_t i = 0; i < size; i++)
     {
         RETURN_ON_ERROR(uartReceiveByte(uartNum, (value + i)));
     }
-
     return UART_SUCCES;
 }
 

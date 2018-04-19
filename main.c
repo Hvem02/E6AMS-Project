@@ -31,7 +31,23 @@
 #include "drivers/uart.h"
 #include "drivers/hm-10.h"
 
+void mainProgram(void);
+void testProgramAlex(void);
+void testProgramSoren(void);
+
 int main()
+{
+    //mainProgram();
+    testProgramAlex();
+    //testProgramSoren();
+}
+
+void mainProgram(void)
+{
+
+}
+
+void testProgramAlex(void)
 {
     uartInit(0, 115200, 'O', 1, 8, 'N');
     hm10Init();
@@ -46,4 +62,9 @@ int main()
         hm10Ready();
         _delay_ms(10);
     }
+}
+
+void testProgramSoren(void)
+{
+
 }
