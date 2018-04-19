@@ -108,6 +108,7 @@ static uint8_t getStopBits(uint8_t uartNum, uint8_t* retVal);
 static uint8_t setStopBits(uint8_t uartNum, uint8_t stopBits);
 static uint8_t getSynchronisationMode(uint8_t uartNum, char* syncMode);
 static uint8_t setSynchronisationMode(uint8_t uartNum, char syncMode);
+static uint8_t getCharacterSize(uint8_t uartNum, uint8_t* charSize);
 static uint8_t setCharacterSize(uint8_t uartNum, uint8_t charSize);
 static char getSpeedMode(uint8_t uartNum);
 static uint8_t setSpeedMode(uint8_t uartNum, char mode);
@@ -360,6 +361,37 @@ static uint8_t setSynchronisationMode(uint8_t uartNum, char syncMode)
     return UART_SUCCES;
 }
 
+static uint8_t getCharacterSize(uint8_t uartNum, uint8_t* charSize)
+{
+    if(((UCSR_B(uartNum) | 0b11111011u) == 0b11111011) &&
+       ((UCSR_C(uartNum) | 0b11111001u) == 0b11111001))
+    {
+        *charSize = 5;
+    }
+    else if(((UCSR_B(uartNum) | 0b11111011u) == 0b11111011) &&
+            ((UCSR_C(uartNum) | 0b11111011u) == 0b11111011) &&
+            ((UCSR_C(uartNum) & 0b00000010u) == 0b00000010))
+    {
+        *charSize = 6;
+    }
+    else if(((UCSR_B(uartNum) | 0b11111011u) == 0b11111011) &&
+            ((UCSR_C(uartNum) | 0b11111101u) == 0b11111101) &&
+            ((UCSR_C(uartNum) & 0b00000100u) == 0b00000100))
+    {
+        *charSize = 7;
+    }
+    else if(((UCSR_B(uartNum) | 0b11111011u) == 0b11111011) &&
+            ((UCSR_C(uartNum) & 0b00000110u) == 0b00000110))
+    {
+        *charSize = 8;
+    }
+    else
+    {
+        return UART_ERROR_CHAR_SIZE;
+    }
+    return UART_SUCCES;
+}
+
 static uint8_t setCharacterSize(uint8_t uartNum, uint8_t charSize)
 {
     if (charSize == 5)
@@ -382,11 +414,6 @@ static uint8_t setCharacterSize(uint8_t uartNum, uint8_t charSize)
     else if (charSize == 8)
     {
         UCSR_B(uartNum) &= 0b11111011;
-        UCSR_C(uartNum) |= 0b00000110;
-    }
-    else if (charSize == 9)
-    {
-        UCSR_B(uartNum) |= 0b00000100;
         UCSR_C(uartNum) |= 0b00000110;
     }
     else

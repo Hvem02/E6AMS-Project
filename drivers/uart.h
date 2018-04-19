@@ -29,7 +29,7 @@
  * @param baudRate  Baudrate for the UART: 110 - 115200
  * @param parity    Is parity used: 'E' for even, 'O' for odd and 'D' for disabled
  * @param stopBits  Number of stopbits used: 1 - 2
- * @param charSize  Size of characters: 5 - 9
+ * @param charSize  Size of characters: 5 - 8, 9-bit not supported
  * @param mode      Normal or fast mode: 'N' or 'F'
  * @return          Returns 0 on succes
  */
