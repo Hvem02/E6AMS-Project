@@ -15,9 +15,17 @@
 #define UART_ERROR_CHAR_SIZE    5
 #define UART_ERROR_SPEED_MODE   6
 #define UART_ERROR_BAUDRATE     7
-#define UART_ERROR_RECEIVE      8
-#define UART_ERROR_TRANSMIT     9
-#define UART_ERROR_TIMEOUT      10
+#define UART_ERROR_NO_CALLBACK  8
+#define UART_ERROR_RECEIVE      9
+#define UART_ERROR_TRANSMIT     10
+#define UART_ERROR_TIMEOUT      11
+
+//***************************************************************
+// Function Pointer Declaration for callbacks                   *
+//***************************************************************
+typedef void (* uartBufferEmptyCallback_t)(uint8_t uartNum);
+typedef void (* uartTransmitByteCallback_t)(uint8_t uartNum);
+typedef void (* uartReceiveByteCallback_t)(uint8_t uartNum, uint8_t byte);
 
 //***************************************************************
 // Public Function Definitions                                  *
@@ -36,6 +44,31 @@
 uint8_t uartInit(uint8_t uartNum, uint32_t baudRate,
               char parity, uint8_t stopBits,
               uint8_t charSize, char mode);
+
+/**
+ *
+ * @param uartNum
+ * @param callback
+ * @return
+ */
+uint8_t uartSetTransmitBufferEmptyCallback(uint8_t uartNum, uartBufferEmptyCallback_t callback);
+
+/**
+ *
+ * @param uartNum
+ * @param callback
+ * @return
+ */
+uint8_t uartSetTransmitByteCallback(uint8_t uartNum, uartTransmitByteCallback_t callback);
+
+/**
+ *
+ * @param uartNum
+ * @param callback
+ * @return
+ */
+uint8_t uartSetReceiveByteCallback(uint8_t uartNum, uartReceiveByteCallback_t callback);
+
 
 /**
  * Function for sending a single byte

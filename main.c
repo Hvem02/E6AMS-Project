@@ -38,8 +38,8 @@ void testProgramSoren(void);
 int main()
 {
     //mainProgram();
-    testProgramAlex();
-    //testProgramSoren();
+    //testProgramAlex();
+    testProgramSoren();
 }
 
 void mainProgram(void)
@@ -64,7 +64,19 @@ void testProgramAlex(void)
     }
 }
 
+void handleCallback(uint8_t uartNum)
+{
+    uartNum++;
+    _delay_ms(100);
+    uartSendByte(0, 'B');
+}
+
 void testProgramSoren(void)
 {
+    uartInit(0, 115200, 'O', 1, 8, 'N');
 
+    uartSetTransmitBufferEmptyCallback(0, handleCallback);
+    uartSendByte(0, 'A');
+    while(1)
+    {}
 }

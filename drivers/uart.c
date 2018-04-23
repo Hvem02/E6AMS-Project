@@ -97,11 +97,20 @@ do                                  \
 }while(0)                           \
 
 //***************************************************************
+// Static Variable Declaration                                  *
+//***************************************************************
+static uartBufferEmptyCallback_t transmitBufferEmptyCallback[4] = {NULL};
+static uartTransmitByteCallback_t transmitByteCallback[4] = {NULL};
+static uartReceiveByteCallback_t receiveByteCallback[4] = {NULL};
+
+//***************************************************************
 // Static Function Declaration                                  *
 //***************************************************************
 static uint8_t validateUartNumber(uint8_t uartNum);
 
 static uint8_t enableTransmitterReceiver(uint8_t uartNum);
+static uint8_t enableUartInterrupt(uint8_t uartNum);
+
 static uint8_t getParity(uint8_t uartNum, char* retVal);
 static uint8_t setParity(uint8_t uartNum, char parity);
 static uint8_t getStopBits(uint8_t uartNum, uint8_t* retVal);
@@ -133,10 +142,34 @@ uint8_t uartInit(uint8_t uartNum, uint32_t baudRate,
     return UART_SUCCES;
 }
 
+uint8_t uartSetTransmitBufferEmptyCallback(uint8_t uartNum, uartBufferEmptyCallback_t callback)
+{
+    RETURN_ON_ERROR(validateUartNumber(uartNum));
+    transmitBufferEmptyCallback[uartNum] = callback;
+    enableUartInterrupt(uartNum);
+    sei();
+    return UART_SUCCES;
+}
+
+uint8_t uartSetTransmitByteCallback(uint8_t uartNum, uartTransmitByteCallback_t callback)
+{
+    RETURN_ON_ERROR(validateUartNumber(uartNum));
+    transmitByteCallback[uartNum] = callback;
+    return UART_SUCCES;
+}
+
+uint8_t uartSetReceiveByteCallback(uint8_t uartNum, uartReceiveByteCallback_t callback)
+{
+    RETURN_ON_ERROR(validateUartNumber(uartNum));
+    receiveByteCallback[uartNum] = callback;
+    return UART_SUCCES;
+}
+
+
 uint8_t uartSendByte(uint8_t uartNum, uint8_t value)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
-    while(uartByteTransmitted(uartNum) != 0);
+    while(uartByteTransmitted(uartNum) != UART_SUCCES);
     UDR_(uartNum) = value;
     return UART_SUCCES;
 }
@@ -242,6 +275,12 @@ static uint8_t validateUartNumber(uint8_t uartNum)
 static uint8_t enableTransmitterReceiver(uint8_t uartNum)
 {
     UCSR_B(uartNum) |= 0b00011000;
+    return UART_SUCCES;
+}
+
+static uint8_t enableUartInterrupt(uint8_t uartNum)
+{
+    UCSR_B(uartNum) |= 0b00100000;
     return UART_SUCCES;
 }
 
@@ -473,12 +512,12 @@ static uint8_t setBaudRate(uint8_t uartNum, uint32_t baudRate)
     if(speedMode == 'N')
     {
         // Normal Speed Mode
-        UBRRValue = (uint16_t )(((8 * baudRate + F_CPU) / (16 * baudRate)) - 1);
+        UBRRValue = (uint16_t)(((8 * baudRate + F_CPU) / (16 * baudRate)) - 1);
     }
     else if(speedMode == 'F')
     {
         // Fast Speed Mode
-        UBRRValue = (uint16_t )(((4 * baudRate + F_CPU) / (8 * baudRate)) - 1);
+        UBRRValue = (uint16_t)(((4 * baudRate + F_CPU) / (8 * baudRate)) - 1);
     }
     else
     {
@@ -489,4 +528,103 @@ static uint8_t setBaudRate(uint8_t uartNum, uint32_t baudRate)
     UBRR_L(uartNum) = (uint8_t)(UBRRValue);
 
     return UART_SUCCES;
+}
+
+//***************************************************************
+// Private Interrupt Vectors                                    *
+//***************************************************************
+ISR(USART0_UDRE_vect)
+{
+    if(transmitBufferEmptyCallback[0] != NULL)
+    {
+        transmitBufferEmptyCallback[0](0);
+    }
+}
+
+ISR(USART0_TX_vect)
+{
+    if(transmitByteCallback[0] != NULL)
+    {
+        transmitByteCallback[0](0);
+    }
+}
+
+ISR(USART0_RX_vect)
+{
+    if(receiveByteCallback[0] != NULL)
+    {
+        receiveByteCallback[0](0, UDR_(0));
+    }
+}
+
+ISR(USART1_UDRE_vect)
+{
+    if(transmitBufferEmptyCallback[1] != NULL)
+    {
+        transmitBufferEmptyCallback[1](1);
+    }
+}
+
+ISR(USART1_TX_vect)
+{
+    if(transmitByteCallback[1] != NULL)
+    {
+        transmitByteCallback[1](1);
+    }
+}
+
+ISR(USART1_RX_vect)
+{
+    if(receiveByteCallback[1] != NULL)
+    {
+        receiveByteCallback[1](1, UDR_(1));
+    }
+}
+
+ISR(USART2_UDRE_vect)
+{
+    if(transmitBufferEmptyCallback[2] != NULL)
+    {
+        transmitBufferEmptyCallback[2](2);
+    }
+}
+
+ISR(USART2_TX_vect)
+{
+    if(transmitByteCallback[2] != NULL)
+    {
+        transmitByteCallback[2](2);
+    }
+}
+
+ISR(USART2_RX_vect)
+{
+    if(receiveByteCallback[2] != NULL)
+    {
+        receiveByteCallback[2](2, UDR_(2));
+    }
+}
+
+ISR(USART3_UDRE_vect)
+{
+    if(transmitBufferEmptyCallback[3] != NULL)
+    {
+        transmitBufferEmptyCallback[3](3);
+    }
+}
+
+ISR(USART3_TX_vect)
+{
+    if(transmitByteCallback[3] != NULL)
+    {
+        transmitByteCallback[3](3);
+    }
+}
+
+ISR(USART3_RX_vect)
+{
+    if(receiveByteCallback[3] != NULL)
+    {
+        receiveByteCallback[3](3, UDR_(3));
+    }
 }
