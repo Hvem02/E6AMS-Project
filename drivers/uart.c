@@ -109,7 +109,13 @@ static uartReceiveByteCallback_t receiveByteCallback[4] = {NULL};
 static uint8_t validateUartNumber(uint8_t uartNum);
 
 static uint8_t enableTransmitterReceiver(uint8_t uartNum);
-static uint8_t enableUartInterrupt(uint8_t uartNum);
+static uint8_t disableTransmitterReceiver(uint8_t uartNum);
+static uint8_t enableEmptyBufferInterrupt(uint8_t uartNum);
+static uint8_t disableEmptyBufferInterrupt(uint8_t uartNum);
+static uint8_t enableTransmitByteInterrupt(uint8_t uartNum);
+static uint8_t disableTransmitByteInterrupt(uint8_t uartNum);
+static uint8_t enableReceiveByteInterrupt(uint8_t uartNum);
+static uint8_t disableReceiveByteInterrupt(uint8_t uartNum);
 
 static uint8_t getParity(uint8_t uartNum, char* retVal);
 static uint8_t setParity(uint8_t uartNum, char parity);
@@ -147,7 +153,7 @@ uint8_t uartSetTransmitBufferEmptyCallback(uint8_t uartNum, uartBufferEmptyCallb
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
     transmitBufferEmptyCallback[uartNum] = callback;
-    enableUartInterrupt(uartNum);
+    enableEmptyBufferInterrupt(uartNum);
     sei();
     return UART_SUCCES;
 }
@@ -279,9 +285,45 @@ static uint8_t enableTransmitterReceiver(uint8_t uartNum)
     return UART_SUCCES;
 }
 
-static uint8_t enableUartInterrupt(uint8_t uartNum)
+static uint8_t disableTransmitterReceiver(uint8_t uartNum)
+{
+    UCSR_B(uartNum) &= 0b11100111;
+    return UART_SUCCES;
+}
+
+static uint8_t enableEmptyBufferInterrupt(uint8_t uartNum)
 {
     UCSR_B(uartNum) |= 0b00100000;
+    return UART_SUCCES;
+}
+
+static uint8_t disableEmptyBufferInterrupt(uint8_t uartNum)
+{
+    UCSR_B(uartNum) &= 0b11011111;
+    return UART_SUCCES;
+}
+
+static uint8_t enableTransmitByteInterrupt(uint8_t uartNum)
+{
+    UCSR_B(uartNum) |= 0b01000000;
+    return UART_SUCCES;
+}
+
+static uint8_t disableTransmitByteInterrupt(uint8_t uartNum)
+{
+    UCSR_B(uartNum) &= 0b10111111;
+    return UART_SUCCES;
+}
+
+static uint8_t enableReceiveByteInterrupt(uint8_t uartNum)
+{
+    UCSR_B(uartNum) |= 0b10000000;
+    return UART_SUCCES;
+}
+
+static uint8_t disableReceiveByteInterrupt(uint8_t uartNum)
+{
+    UCSR_B(uartNum) &= 0b01111111;
     return UART_SUCCES;
 }
 
