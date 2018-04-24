@@ -152,15 +152,29 @@ uint8_t uartInit(uint8_t uartNum, uint32_t baudRate,
 uint8_t uartSetTransmitBufferEmptyCallback(uint8_t uartNum, uartBufferEmptyCallback_t callback)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
+    if(callback != NULL)
+    {
+        enableEmptyBufferInterrupt(uartNum);
+    }
+    else
+    {
+        disableEmptyBufferInterrupt(uartNum);
+    }
     transmitBufferEmptyCallback[uartNum] = callback;
-    enableEmptyBufferInterrupt(uartNum);
-    sei();
     return UART_SUCCES;
 }
 
 uint8_t uartSetTransmitByteCallback(uint8_t uartNum, uartTransmitByteCallback_t callback)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
+    if(callback != NULL)
+    {
+        enableTransmitByteInterrupt(uartNum);
+    }
+    else
+    {
+        disableTransmitByteInterrupt(uartNum);
+    }
     transmitByteCallback[uartNum] = callback;
     return UART_SUCCES;
 }
@@ -168,10 +182,17 @@ uint8_t uartSetTransmitByteCallback(uint8_t uartNum, uartTransmitByteCallback_t 
 uint8_t uartSetReceiveByteCallback(uint8_t uartNum, uartReceiveByteCallback_t callback)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
+    if(callback != NULL)
+    {
+        enableReceiveByteInterrupt(uartNum);
+    }
+    else
+    {
+        disableReceiveByteInterrupt(uartNum);
+    }
     receiveByteCallback[uartNum] = callback;
     return UART_SUCCES;
 }
-
 
 uint8_t uartSendByte(uint8_t uartNum, uint8_t value)
 {
@@ -544,7 +565,7 @@ static uint8_t setSpeedMode(uint8_t uartNum, char mode)
 static uint8_t getBaudRate(uint8_t uartNum, uint32_t* baudRate)
 {
     uint16_t UBRRValue = 0;
-    UBRRValue |= (uint16_t)(UBRR_H(uartNum) << 8);
+    UBRRValue |= (uint16_t)(UBRR_H(uartNum) << 8u);
     UBRRValue |= ((uint16_t)UBRR_L(uartNum));
 
     char speedMode = 0;
