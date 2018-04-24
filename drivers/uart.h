@@ -46,26 +46,32 @@ uint8_t uartInit(uint8_t uartNum, uint32_t baudRate,
               uint8_t charSize, char mode);
 
 /**
+ * Function for setting callback function for when the transmit buffer is empty.
+ * The interrupt can be disabled by passing NULL to this function.
  *
- * @param uartNum
- * @param callback
- * @return
+ * @param uartNum   Which UART is used: 0 - 3
+ * @param callback  Callback function pointer
+ * @return          Returns 0 on succes
  */
 uint8_t uartSetTransmitBufferEmptyCallback(uint8_t uartNum, uartBufferEmptyCallback_t callback);
 
 /**
+ * Function for setting callback function for when a byte has been transmitted.
+ * The interrupt can be disabled by passing NULL to this function.
  *
- * @param uartNum
- * @param callback
- * @return
+ * @param uartNum   Which UART is used: 0 - 3
+ * @param callback  Callback function pointer
+ * @return          Returns 0 on succes
  */
 uint8_t uartSetTransmitByteCallback(uint8_t uartNum, uartTransmitByteCallback_t callback);
 
 /**
+ * Function for setting callback function for when a byte has be received.
+ * The interrupt can be disabled by passing NULL to this function.
  *
- * @param uartNum
- * @param callback
- * @return
+ * @param uartNum   Which UART is used: 0 - 3
+ * @param callback  Callback function pointer
+ * @return          Returns 0 on succes
  */
 uint8_t uartSetReceiveByteCallback(uint8_t uartNum, uartReceiveByteCallback_t callback);
 
