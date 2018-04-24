@@ -121,6 +121,7 @@ static uint8_t getCharacterSize(uint8_t uartNum, uint8_t* charSize);
 static uint8_t setCharacterSize(uint8_t uartNum, uint8_t charSize);
 static uint8_t getSpeedMode(uint8_t uartNum, char* mode);
 static uint8_t setSpeedMode(uint8_t uartNum, char mode);
+static uint8_t getBaudRate(uint8_t uartNum, uint32_t* baudRate);
 static uint8_t setBaudRate(uint8_t uartNum, uint32_t baudRate);
 
 //***************************************************************
@@ -495,6 +496,31 @@ static uint8_t setSpeedMode(uint8_t uartNum, char mode)
         return UART_ERROR_SPEED_MODE;
     }
 
+    return UART_SUCCES;
+}
+
+static uint8_t getBaudRate(uint8_t uartNum, uint32_t* baudRate)
+{
+    uint16_t UBRRValue = 0;
+    UBRRValue |= (uint16_t)(UBRR_H(uartNum) << 8);
+    UBRRValue |= ((uint16_t)UBRR_L(uartNum));
+
+    char speedMode = 0;
+    getSpeedMode(uartNum, &speedMode);
+
+    if(speedMode == 'N')
+    {
+        *baudRate = (uint16_t)((F_CPU) / (16 * (UBRRValue + 1)));
+    }
+    else if(speedMode == 'F')
+    {
+        *baudRate = (uint16_t)((F_CPU) / (8 * (UBRRValue + 1)));
+    }
+    else
+    {
+        *baudRate = 0;
+        return UART_ERROR_SPEED_MODE;
+    }
     return UART_SUCCES;
 }
 
