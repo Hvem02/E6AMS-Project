@@ -94,7 +94,7 @@ do                                  \
     {                               \
         return retVal;              \
     }                               \
-}while(0)                           \
+}while(0)
 
 //***************************************************************
 // Static Variable Declaration                                  *
@@ -622,98 +622,34 @@ static uint8_t setBaudRate(uint8_t uartNum, uint32_t baudRate)
 //***************************************************************
 // Private Interrupt Vectors                                    *
 //***************************************************************
-ISR(USART0_UDRE_vect)
-{
-    if(transmitBufferEmptyCallback[0] != NULL)
-    {
-        transmitBufferEmptyCallback[0](0);
-    }
+// Macro function for ensure identical functions for ISR's
+#define UART_ISR_FUNCTIONS(UART_NUM)                        \
+ISR(USART ## UART_NUM ## _UDRE_vect)                        \
+{                                                           \
+    if(transmitBufferEmptyCallback[(UART_NUM)] != NULL)     \
+    {                                                       \
+        transmitBufferEmptyCallback[(UART_NUM)]((UART_NUM));\
+    }                                                       \
+};                                                          \
+                                                            \
+ISR(USART ## UART_NUM ## _TX_vect)                          \
+{                                                           \
+    if(transmitByteCallback[(UART_NUM)] != NULL)            \
+    {                                                       \
+        transmitByteCallback[(UART_NUM)]((UART_NUM));       \
+    }                                                       \
+};                                                          \
+                                                            \
+ISR(USART ## UART_NUM ## _RX_vect)                          \
+{                                                           \
+    if(receiveByteCallback[(UART_NUM)] != NULL)             \
+    {                                                       \
+        receiveByteCallback[(UART_NUM)]((UART_NUM));        \
+    }                                                       \
 }
 
-ISR(USART0_TX_vect)
-{
-    if(transmitByteCallback[0] != NULL)
-    {
-        transmitByteCallback[0](0);
-    }
-}
-
-ISR(USART0_RX_vect)
-{
-    if(receiveByteCallback[0] != NULL)
-    {
-        receiveByteCallback[0](0, UDR_(0));
-    }
-}
-
-ISR(USART1_UDRE_vect)
-{
-    if(transmitBufferEmptyCallback[1] != NULL)
-    {
-        transmitBufferEmptyCallback[1](1);
-    }
-}
-
-ISR(USART1_TX_vect)
-{
-    if(transmitByteCallback[1] != NULL)
-    {
-        transmitByteCallback[1](1);
-    }
-}
-
-ISR(USART1_RX_vect)
-{
-    if(receiveByteCallback[1] != NULL)
-    {
-        receiveByteCallback[1](1, UDR_(1));
-    }
-}
-
-ISR(USART2_UDRE_vect)
-{
-    if(transmitBufferEmptyCallback[2] != NULL)
-    {
-        transmitBufferEmptyCallback[2](2);
-    }
-}
-
-ISR(USART2_TX_vect)
-{
-    if(transmitByteCallback[2] != NULL)
-    {
-        transmitByteCallback[2](2);
-    }
-}
-
-ISR(USART2_RX_vect)
-{
-    if(receiveByteCallback[2] != NULL)
-    {
-        receiveByteCallback[2](2, UDR_(2));
-    }
-}
-
-ISR(USART3_UDRE_vect)
-{
-    if(transmitBufferEmptyCallback[3] != NULL)
-    {
-        transmitBufferEmptyCallback[3](3);
-    }
-}
-
-ISR(USART3_TX_vect)
-{
-    if(transmitByteCallback[3] != NULL)
-    {
-        transmitByteCallback[3](3);
-    }
-}
-
-ISR(USART3_RX_vect)
-{
-    if(receiveByteCallback[3] != NULL)
-    {
-        receiveByteCallback[3](3, UDR_(3));
-    }
-}
+// Macro function expansions for each UART
+UART_ISR_FUNCTIONS(0);
+UART_ISR_FUNCTIONS(1);
+UART_ISR_FUNCTIONS(2);
+UART_ISR_FUNCTIONS(3);

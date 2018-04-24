@@ -27,6 +27,7 @@
 
 #include <avr/io.h>
 #include <util/delay.h>
+#include <avr/interrupt.h>
 
 #include "drivers/uart.h"
 #include "drivers/hm-10.h"
@@ -66,17 +67,20 @@ void testProgramAlex(void)
 
 void handleCallback(uint8_t uartNum)
 {
-    uartNum++;
+    uint8_t ch = 0;
+    uartReceiveByte(uartNum, &ch);
+    uartSendByte(uartNum, 'A');
     _delay_ms(100);
-    uartSendByte(0, 'B');
 }
 
 void testProgramSoren(void)
 {
     uartInit(0, 115200, 'O', 1, 8, 'N');
 
-    uartSetTransmitBufferEmptyCallback(0, handleCallback);
-    uartSendByte(0, 'A');
+    //uartSetTransmitBufferEmptyCallback(0, handleCallback);
+    //uartSendByte(0, 'A');
+    uartSetReceiveByteCallback(0, handleCallback);
+    sei();
     while(1)
     {}
 }

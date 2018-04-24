@@ -10,6 +10,7 @@
 #define HM_10_START_BITS    1
 #define HM_10_STOP_BITS     1
 
+#define HM_10_ERROR_TIMEOUT 10
 
 const char* timeoutError = "I did not receive a char within the 10 ms timeout\r\n";
 const char* atTest = "AT";
@@ -57,7 +58,7 @@ bool sendWithResponse(const char* message, char* buffer) {
 //        uint8_t success = readCharWithDelay(HM_10_UART, &response);
         uint8_t success = uartReceiveByte(HM_10_UART, &response);
 
-        if (success == UART_ERROR_TIMEOUT) {
+        if (success == HM_10_ERROR_TIMEOUT) {
             // Timeout error
             uartSendString(DEBUG_UART, timeoutError);
             return false;
@@ -98,7 +99,7 @@ uint8_t readCharWithDelay(uint8_t uartNum, uint8_t* retVal)
         }
         _delay_ms(waitTime);
     }
-    return UART_ERROR_TIMEOUT;
+    return HM_10_ERROR_TIMEOUT;
 }
 
 //***************************************************************

@@ -15,17 +15,15 @@
 #define UART_ERROR_CHAR_SIZE    5
 #define UART_ERROR_SPEED_MODE   6
 #define UART_ERROR_BAUDRATE     7
-#define UART_ERROR_NO_CALLBACK  8
-#define UART_ERROR_RECEIVE      9
-#define UART_ERROR_TRANSMIT     10
-#define UART_ERROR_TIMEOUT      11
+#define UART_ERROR_RECEIVE      8
+#define UART_ERROR_TRANSMIT     9
 
 //***************************************************************
 // Function Pointer Declaration for callbacks                   *
 //***************************************************************
 typedef void (* uartBufferEmptyCallback_t)(uint8_t uartNum);
 typedef void (* uartTransmitByteCallback_t)(uint8_t uartNum);
-typedef void (* uartReceiveByteCallback_t)(uint8_t uartNum, uint8_t byte);
+typedef void (* uartReceiveByteCallback_t)(uint8_t uartNum);
 
 //***************************************************************
 // Public Function Definitions                                  *
