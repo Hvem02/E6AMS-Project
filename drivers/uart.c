@@ -618,24 +618,29 @@ static uint8_t setBaudRate(uint8_t uartNum, uint32_t baudRate)
 //***************************************************************
 // Interrupt Vectors                                            *
 //***************************************************************
-// Macro function for ensure identical functions for ISR's
-#define UART_ISR_FUNCTIONS(UART_NUM)                        \
+
+// Macro function for transmit buffer full ISR
+#define UART_TRANSMIT_BUFFER_ISR_FUNCTION(UART_NUM)         \
 ISR(USART ## UART_NUM ## _UDRE_vect)                        \
 {                                                           \
     if(transmitBufferEmptyCallback[(UART_NUM)] != NULL)     \
     {                                                       \
         transmitBufferEmptyCallback[(UART_NUM)]((UART_NUM));\
     }                                                       \
-};                                                          \
-                                                            \
+}
+
+// Macro function for transmit byte ISR
+#define UART_TRANSMIT_BYTE_ISR_FUNCTION(UART_NUM)           \
 ISR(USART ## UART_NUM ## _TX_vect)                          \
 {                                                           \
     if(transmitByteCallback[(UART_NUM)] != NULL)            \
     {                                                       \
         transmitByteCallback[(UART_NUM)]((UART_NUM));       \
     }                                                       \
-};                                                          \
-                                                            \
+}
+
+// Macro function for receive byte ISR
+#define UART_RECEIVE_BYTE_ISR_FUNCTION(UART_NUM)            \
 ISR(USART ## UART_NUM ## _RX_vect)                          \
 {                                                           \
     if(receiveByteCallback[(UART_NUM)] != NULL)             \
@@ -643,6 +648,12 @@ ISR(USART ## UART_NUM ## _RX_vect)                          \
         receiveByteCallback[(UART_NUM)]((UART_NUM));        \
     }                                                       \
 }
+
+// Macro function for all UART ISR's
+#define UART_ISR_FUNCTIONS(UART_NUM)                        \
+UART_TRANSMIT_BUFFER_ISR_FUNCTION(UART_NUM);                \
+UART_TRANSMIT_BYTE_ISR_FUNCTION(UART_NUM);                  \
+UART_RECEIVE_BYTE_ISR_FUNCTION(UART_NUM);
 
 // Macro function expansions for each UART
 UART_ISR_FUNCTIONS(0);
