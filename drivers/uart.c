@@ -265,22 +265,22 @@ uint8_t uartReceiveString(uint8_t uartNum, char* string)
     return UART_SUCCES;
 }
 
-uint8_t uartByteReceived(uint8_t uartNum)
-{
-    RETURN_ON_ERROR(validateUartNumber(uartNum));
-    if((UCSR_A(uartNum) & 0b10000000u) != 0b10000000)
-    {
-        return UART_ERROR_RECEIVE;
-    }
-    return UART_SUCCES;
-}
-
 uint8_t uartByteTransmitted(uint8_t uartNum)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
     if((UCSR_A(uartNum) & 0b00100000u) != 0b00100000)
     {
         return UART_ERROR_TRANSMIT;
+    }
+    return UART_SUCCES;
+}
+
+uint8_t uartByteReceived(uint8_t uartNum)
+{
+    RETURN_ON_ERROR(validateUartNumber(uartNum));
+    if((UCSR_A(uartNum) & 0b10000000u) != 0b10000000)
+    {
+        return UART_ERROR_RECEIVE;
     }
     return UART_SUCCES;
 }
@@ -389,7 +389,6 @@ static uint8_t setParity(uint8_t uartNum, char parity)
     {
         return UART_ERROR_PARITY;
     }
-
     return UART_SUCCES;
 }
 
@@ -424,7 +423,6 @@ static uint8_t setStopBits(uint8_t uartNum, uint8_t stopBits)
     {
         return UART_ERROR_STOP_BITS;
     }
-
     return UART_SUCCES;
 }
 
@@ -523,7 +521,6 @@ static uint8_t setCharacterSize(uint8_t uartNum, uint8_t charSize)
     {
         return UART_ERROR_CHAR_SIZE;
     }
-
     return UART_SUCCES;
 }
 
@@ -558,7 +555,6 @@ static uint8_t setSpeedMode(uint8_t uartNum, char mode)
     {
         return UART_ERROR_SPEED_MODE;
     }
-
     return UART_SUCCES;
 }
 
@@ -620,7 +616,7 @@ static uint8_t setBaudRate(uint8_t uartNum, uint32_t baudRate)
 }
 
 //***************************************************************
-// Private Interrupt Vectors                                    *
+// Interrupt Vectors                                            *
 //***************************************************************
 // Macro function for ensure identical functions for ISR's
 #define UART_ISR_FUNCTIONS(UART_NUM)                        \

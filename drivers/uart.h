@@ -103,7 +103,7 @@ uint8_t uartSendByteArray(uint8_t uartNum, uint8_t const * array, uint16_t size)
 uint8_t uartSendString(uint8_t uartNum, char const * string);
 
 /**
- * Function for sending an integer formated as text
+ * Function for sending an integer formated as text.
  *
  * @param uartNum   Which UART is used: 0 - 3
  * @param value     Value to be sent
@@ -142,19 +142,19 @@ uint8_t  uartReceiveByteArray(uint8_t uartNum, uint8_t* value, uint16_t size);
 uint8_t uartReceiveString(uint8_t uartNum, char* string);
 
 /**
- * Function for checking if a byte has been received
- *
- * @param uartNum   Which UART is used: 0 - 3
- * @return          Returns 0 on if byte is received
- */
-uint8_t uartByteReceived(uint8_t uartNum);
-
-/**
  * Function for checking if a byte has been transmitted
  *
  * @param uartNum   Which UART is used: 0 - 3
  * @return          Returns 0 on if byte is transmitted
  */
 uint8_t uartByteTransmitted(uint8_t uartNum);
+
+/**
+ * Function for checking if a byte has been received
+ *
+ * @param uartNum   Which UART is used: 0 - 3
+ * @return          Returns 0 on if byte is received
+ */
+uint8_t uartByteReceived(uint8_t uartNum);
 
 #endif //UART_H
