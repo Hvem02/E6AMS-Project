@@ -220,7 +220,8 @@ uint8_t uartSendByteArray(uint8_t uartNum, uint8_t const * array, uint16_t size)
     RETURN_ON_ERROR(validateUartNumber(uartNum));
     for(uint16_t i = 0; i < size; i++)
     {
-        uartSendByteBlocking(uartNum, array[i]);
+        while(uartTransmitBufferEmptied(uartNum) != UART_SUCCES);
+        addToTransmitBuffer(uartNum, array[i]);
     }
     return UART_SUCCES;
 }
