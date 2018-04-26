@@ -197,7 +197,7 @@ uint8_t uartSetReceiveByteCallback(uint8_t uartNum, uartReceiveByteCallback_t ca
 uint8_t uartSendByte(uint8_t uartNum, uint8_t value)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
-    while(uartByteTransmitted(uartNum) != UART_SUCCES);
+    while(uartTransmitBufferEmptied(uartNum) != UART_SUCCES);
     UDR_(uartNum) = value;
     return UART_SUCCES;
 }
@@ -236,7 +236,7 @@ uint8_t uartSendInteger(uint8_t uartNum, int16_t value, uint8_t base)
 uint8_t uartReceiveByte(uint8_t uartNum, uint8_t* value)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
-    RETURN_ON_ERROR(uartByteReceived(uartNum));
+    while(uartByteReceived(uartNum) != UART_SUCCES);
     (*value) = UDR_(uartNum);
     return UART_SUCCES;
 }
