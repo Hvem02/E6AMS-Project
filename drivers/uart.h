@@ -99,6 +99,7 @@ uint8_t uartSendByteNonBlocking(uint8_t uartNum, uint8_t value);
 
 /**
  * Function for sending an array of bytes.
+ * This function blocks until the array has been sent.
  *
  * @param uartNum   Which UART is used: 0 - 3.
  * @param array     Array of bytes to be sent.
