@@ -99,9 +99,9 @@ do                                  \
 //***************************************************************
 // Static Variable Declaration                                  *
 //***************************************************************
-static uartBufferEmptyCallback_t transmitBufferEmptyCallback[4] = {NULL};
-static uartTransmitByteCallback_t transmitByteCallback[4] = {NULL};
-static uartReceiveByteCallback_t receiveByteCallback[4] = {NULL};
+static uartCallback_t transmitBufferEmptyCallback[4] = {NULL};
+static uartCallback_t transmitByteCallback[4] = {NULL};
+static uartCallback_t receiveByteCallback[4] = {NULL};
 
 //***************************************************************
 // Static Function Declaration                                  *
@@ -154,7 +154,7 @@ uint8_t uartInit(uint8_t uartNum, uint32_t baudRate,
     return UART_SUCCES;
 }
 
-uint8_t uartSetTransmitBufferEmptyCallback(uint8_t uartNum, uartBufferEmptyCallback_t callback)
+uint8_t uartSetTransmitBufferEmptyCallback(uint8_t uartNum, uartCallback_t callback)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
     if(callback != NULL)
@@ -169,7 +169,7 @@ uint8_t uartSetTransmitBufferEmptyCallback(uint8_t uartNum, uartBufferEmptyCallb
     return UART_SUCCES;
 }
 
-uint8_t uartSetTransmitByteCallback(uint8_t uartNum, uartTransmitByteCallback_t callback)
+uint8_t uartSetTransmitByteCallback(uint8_t uartNum, uartCallback_t callback)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
     if(callback != NULL)
@@ -184,7 +184,7 @@ uint8_t uartSetTransmitByteCallback(uint8_t uartNum, uartTransmitByteCallback_t 
     return UART_SUCCES;
 }
 
-uint8_t uartSetReceiveByteCallback(uint8_t uartNum, uartReceiveByteCallback_t callback)
+uint8_t uartSetReceiveByteCallback(uint8_t uartNum, uartCallback_t callback)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
     if(callback != NULL)

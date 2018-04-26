@@ -25,9 +25,7 @@
 //***************************************************************
 // Function Pointer Declaration for callbacks                   *
 //***************************************************************
-typedef void (* uartBufferEmptyCallback_t)(uint8_t uartNum);
-typedef void (* uartTransmitByteCallback_t)(uint8_t uartNum);
-typedef void (* uartReceiveByteCallback_t)(uint8_t uartNum);
+typedef void (* uartCallback_t)(uint8_t uartNum);
 
 //***************************************************************
 // Public Function Definitions                                  *
@@ -55,7 +53,7 @@ uint8_t uartInit(uint8_t uartNum, uint32_t baudRate,
  * @param callback  Callback function pointer.
  * @return          Returns 0 on succes.
  */
-uint8_t uartSetTransmitBufferEmptyCallback(uint8_t uartNum, uartBufferEmptyCallback_t callback);
+uint8_t uartSetTransmitBufferEmptyCallback(uint8_t uartNum, uartCallback_t callback);
 
 /**
  * Function for setting callback function for when a byte has been transmitted.
@@ -65,7 +63,7 @@ uint8_t uartSetTransmitBufferEmptyCallback(uint8_t uartNum, uartBufferEmptyCallb
  * @param callback  Callback function pointer.
  * @return          Returns 0 on succes.
  */
-uint8_t uartSetTransmitByteCallback(uint8_t uartNum, uartTransmitByteCallback_t callback);
+uint8_t uartSetTransmitByteCallback(uint8_t uartNum, uartCallback_t callback);
 
 /**
  * Function for setting callback function for when a byte has be received.
@@ -75,17 +73,7 @@ uint8_t uartSetTransmitByteCallback(uint8_t uartNum, uartTransmitByteCallback_t 
  * @param callback  Callback function pointer.
  * @return          Returns 0 on succes.
  */
-uint8_t uartSetReceiveByteCallback(uint8_t uartNum, uartReceiveByteCallback_t callback);
-
-/**
- * Function for sending a single byte.
- * This functions blocks until the byte has been sent.
- *
- * @param uartNum   Which UART is used: 0 - 3.
- * @param value     Character to be sent.
- * @return          Returns 0 on succes.
- */
-uint8_t uartSendByteBlocking(uint8_t uartNum, uint8_t value);
+uint8_t uartSetReceiveByteCallback(uint8_t uartNum, uartCallback_t callback);
 
 /**
  * Function for sending a single byte.
