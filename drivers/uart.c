@@ -130,6 +130,9 @@ static uint8_t setSpeedMode(uint8_t uartNum, char mode);
 static uint8_t getBaudRate(uint8_t uartNum, uint32_t* baudRate);
 static uint8_t setBaudRate(uint8_t uartNum, uint32_t baudRate);
 
+static uint8_t addToTransmitBuffer(uint8_t uartNum, uint8_t byte);
+static uint8_t readFromReceiveBuffer(uint8_t uartNum, uint8_t* byte);
+
 //***************************************************************
 // Public Function Implementation                               *
 //***************************************************************
@@ -631,6 +634,18 @@ static uint8_t setBaudRate(uint8_t uartNum, uint32_t baudRate)
     UBRR_H(uartNum) = (uint8_t)(UBRRValue >> 8u);
     UBRR_L(uartNum) = (uint8_t)(UBRRValue);
 
+    return UART_SUCCES;
+}
+
+static uint8_t addToTransmitBuffer(uint8_t uartNum, uint8_t byte)
+{
+    UDR_(uartNum) = byte;
+    return UART_SUCCES;
+}
+
+static uint8_t readFromReceiveBuffer(uint8_t uartNum, uint8_t* byte)
+{
+    *byte = UDR_(uartNum);
     return UART_SUCCES;
 }
 
