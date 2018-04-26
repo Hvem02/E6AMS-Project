@@ -231,10 +231,12 @@ uint8_t uartSendString(uint8_t uartNum, char const * string)
     RETURN_ON_ERROR(validateUartNumber(uartNum));
     while(*string != '\0')
     {
-        uartSendByte(uartNum, (uint8_t)*string);
+        while(uartTransmitBufferEmptied(uartNum) != UART_SUCCES);
+        addToTransmitBuffer(uartNum, (uint8_t)*string);
         string++;
     }
-    uartSendByte(uartNum, '\0');
+    while(uartTransmitBufferEmptied(uartNum) != UART_SUCCES);
+    addToTransmitBuffer(uartNum, '\0');
     return UART_SUCCES;
 }
 

@@ -110,6 +110,7 @@ uint8_t uartSendByteArray(uint8_t uartNum, uint8_t const * array, uint16_t size)
 
 /**
  * Function for sending a null-terminated string.
+ * The null-terminating will also be sent.
  *
  * @param uartNum   Which UART is used: 0 - 3.
  * @param string    Null terminated string to be sendt.
