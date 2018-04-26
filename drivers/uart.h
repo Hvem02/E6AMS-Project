@@ -130,32 +130,13 @@ uint8_t uartSendInteger(uint8_t uartNum, int16_t value, uint8_t base);
 
 /**
  * Function for receiving a single byte.
- * This function is blocking and should only be called when a byte has been received.
+ * This function is non-blocking and will return an error if no byte has been received.
  *
  * @param uartNum   Which UART is used: 0 - 3.
  * @param value     Pointer to variable to hold received character.
  * @return          Returns 0 on succes.
  */
-uint8_t uartReceiveByte(uint8_t uartNum, uint8_t* value);
-
-/**
- * Function for receiving an array of data.
- *
- * @param uartNum   Which UART is used: 0 - 3.
- * @param value     Pointer to variable to hold received character.
- * @param size      Size of receive buffer.
- * @return          Returns 0 on succes.
- */
-uint8_t  uartReceiveByteArray(uint8_t uartNum, uint8_t* value, uint16_t size);
-
-/**
- * Function for receiving a null-terminated string.
- *
- * @param uartNum   Which UART is used: 0 - 3.
- * @param string    Char buffer for revceived message.
- * @return          Returns 0 on succes.
- */
-uint8_t uartReceiveString(uint8_t uartNum, char* string);
+uint8_t uartReceiveByteNonBlocking(uint8_t uartNum, uint8_t* valuePtr);
 
 /**
  * Function for checking if the transmitbuffer is empty.
