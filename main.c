@@ -58,7 +58,7 @@ void testProgramAlex(void)
     {
         _delay_ms(1000);
         uint8_t c[3] = {0};
-        uartReceiveByteArray(0, c, 3);
+        //uartReceiveByteArray(0, c, 3);
         uartSendByteArray(0, c, 3);
         hm10Ready();
         _delay_ms(10);
@@ -72,11 +72,11 @@ void handleCallback(uint8_t uartNum)
     uartReceiveByte(uartNum, &ch);
     if(err == UART_SUCCES)
     {
-        uartSendByteBlocking(uartNum, ch);
+        uartSendByte(uartNum, ch);
     }
     else
     {
-        uartSendByteBlocking(uartNum, 'X');
+        uartSendByte(uartNum, 'X');
     }
     _delay_ms(100);
 }
@@ -89,7 +89,7 @@ void testProgramSoren(void)
 
     for(uint8_t i = 'A'; i <= 'Z'; i++)
     {
-        uartSendByteBlocking(0, i);
+        while(uartSendByte(0, i) != UART_SUCCES);
         _delay_ms(100);
     }
     uartSetReceiveByteCallback(0, handleCallback);

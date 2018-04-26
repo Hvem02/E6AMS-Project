@@ -95,7 +95,7 @@ uint8_t uartSendByteBlocking(uint8_t uartNum, uint8_t value);
  * @param value     Character to be sent.
  * @return          Returns 0 on succes.
  */
-uint8_t uartSendByteNonBlocking(uint8_t uartNum, uint8_t value);
+uint8_t uartSendByte(uint8_t uartNum, uint8_t value);
 
 /**
  * Function for sending an array of bytes.
@@ -136,7 +136,7 @@ uint8_t uartSendInteger(uint8_t uartNum, int16_t value, uint8_t base);
  * @param value     Pointer to variable to hold received character.
  * @return          Returns 0 on succes.
  */
-uint8_t uartReceiveByteNonBlocking(uint8_t uartNum, uint8_t* valuePtr);
+uint8_t uartReceiveByte(uint8_t uartNum, uint8_t* valuePtr);
 
 /**
  * Function for checking if the transmitbuffer is empty.
