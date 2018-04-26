@@ -207,6 +207,14 @@ uint8_t uartSendByteBlocking(uint8_t uartNum, uint8_t value)
     return UART_SUCCES;
 }
 
+uint8_t uartSendByteNonBlocking(uint8_t uartNum, uint8_t value)
+{
+    RETURN_ON_ERROR(validateUartNumber(uartNum));
+    RETURN_ON_ERROR(uartTransmitBufferEmptied(uartNum));
+    addToTransmitBuffer(uartNum, value);
+    return UART_SUCCES;
+}
+
 uint8_t uartSendByteArray(uint8_t uartNum, uint8_t const * array, uint16_t size)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));

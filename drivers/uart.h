@@ -88,6 +88,16 @@ uint8_t uartSetReceiveByteCallback(uint8_t uartNum, uartReceiveByteCallback_t ca
 uint8_t uartSendByteBlocking(uint8_t uartNum, uint8_t value);
 
 /**
+ * Function for sending a single byte.
+ * This function is non-blocking and will return error if it not possible to send byte.
+ *
+ * @param uartNum   Which UART is used: 0 - 3.
+ * @param value     Character to be sent.
+ * @return          Returns 0 on succes.
+ */
+uint8_t uartSendByteNonBlocking(uint8_t uartNum, uint8_t value);
+
+/**
  * Function for sending an array of bytes.
  *
  * @param uartNum   Which UART is used: 0 - 3.
