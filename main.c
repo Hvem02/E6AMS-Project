@@ -67,9 +67,17 @@ void testProgramAlex(void)
 
 void handleCallback(uint8_t uartNum)
 {
+    uint8_t err = uartByteReceived(uartNum);
     uint8_t ch = 0;
     uartReceiveByte(uartNum, &ch);
-    uartSendByte(uartNum, 'A');
+    if(err == UART_SUCCES)
+    {
+        uartSendByte(uartNum, ch);
+    }
+    else
+    {
+        uartSendByte(uartNum, 'X');
+    }
     _delay_ms(100);
 }
 
@@ -78,7 +86,12 @@ void testProgramSoren(void)
     uartInit(0, 115200, 'O', 1, 8, 'N');
 
     //uartSetTransmitBufferEmptyCallback(0, handleCallback);
-    //uartSendByte(0, 'A');
+
+    for(char i = 'A'; i <= 'Z'; i++)
+    {
+        uartSendByte(0, i);
+        _delay_ms(100);
+    }
     uartSetReceiveByteCallback(0, handleCallback);
     sei();
     while(1)
