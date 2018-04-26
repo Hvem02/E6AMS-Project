@@ -265,24 +265,43 @@ uint8_t uartReceiveString(uint8_t uartNum, char* string)
     return UART_SUCCES;
 }
 
+uint8_t uartTransmitBufferEmptied(uint8_t uartNum)
+{
+    RETURN_ON_ERROR(validateUartNumber(uartNum));
+    if((UCSR_A(uartNum) & 0b00100000u) == 0b00100000)
+    {
+        return UART_SUCCES;
+    }
+    else
+    {
+        return UART_ERROR_BUFFER;
+    }
+}
+
 uint8_t uartByteTransmitted(uint8_t uartNum)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
-    if((UCSR_A(uartNum) & 0b00100000u) != 0b00100000)
+    if((UCSR_A(uartNum) & 0b01000000u) == 0b01000000)
+    {
+        return UART_SUCCES;
+    }
+    else
     {
         return UART_ERROR_TRANSMIT;
     }
-    return UART_SUCCES;
 }
 
 uint8_t uartByteReceived(uint8_t uartNum)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
-    if((UCSR_A(uartNum) & 0b10000000u) != 0b10000000)
+    if((UCSR_A(uartNum) & 0b10000000u) == 0b10000000)
+    {
+        return UART_SUCCES;
+    }
+    else
     {
         return UART_ERROR_RECEIVE;
     }
-    return UART_SUCCES;
 }
 
 //***************************************************************
