@@ -133,6 +133,8 @@ static uint8_t setBaudRate(uint8_t uartNum, uint32_t baudRate);
 static uint8_t addToTransmitBuffer(uint8_t uartNum, uint8_t byte);
 static uint8_t readFromReceiveBuffer(uint8_t uartNum, uint8_t* byte);
 
+static uint8_t checkReceiveError(uint8_t uartNum);
+
 //***************************************************************
 // Public Function Implementation                               *
 //***************************************************************
@@ -277,7 +279,7 @@ uint8_t uartTransmitBufferEmptied(uint8_t uartNum)
     }
     else
     {
-        return UART_ERROR_BUFFER;
+        return UART_BUFFER_ERROR_NOT_EMPTY;
     }
 }
 
@@ -290,7 +292,7 @@ uint8_t uartByteTransmitted(uint8_t uartNum)
     }
     else
     {
-        return UART_ERROR_TRANSMIT;
+        return UART_TRANSMIT_ERROR;
     }
 }
 
@@ -303,7 +305,7 @@ uint8_t uartByteReceived(uint8_t uartNum)
     }
     else
     {
-        return UART_ERROR_RECEIVE;
+        return UART_RECEIVE_ERROR_NOT_RECEIVED;
     }
 }
 
@@ -318,7 +320,7 @@ static uint8_t validateUartNumber(uint8_t uartNum)
     }
     else
     {
-        return UART_ERROR_UART_NUM;
+        return UART_SETUP_ERROR_UART_NUM;
     }
 }
 
@@ -387,7 +389,7 @@ static uint8_t getParity(uint8_t uartNum, char* retVal)
     }
     else
     {
-        return UART_ERROR_PARITY;
+        return UART_SETUP_ERROR_PARITY;
     }
     return UART_SUCCES;
 }
@@ -409,7 +411,7 @@ static uint8_t setParity(uint8_t uartNum, char parity)
     }
     else
     {
-        return UART_ERROR_PARITY;
+        return UART_SETUP_ERROR_PARITY;
     }
     return UART_SUCCES;
 }
@@ -426,7 +428,7 @@ static uint8_t getStopBits(uint8_t uartNum, uint8_t* retVal)
     }
     else
     {
-        return UART_ERROR_STOP_BITS;
+        return UART_SETUP_ERROR_STOP_BITS;
     }
     return UART_SUCCES;
 }
@@ -443,7 +445,7 @@ static uint8_t setStopBits(uint8_t uartNum, uint8_t stopBits)
     }
     else
     {
-        return UART_ERROR_STOP_BITS;
+        return UART_SETUP_ERROR_STOP_BITS;
     }
     return UART_SUCCES;
 }
@@ -461,7 +463,7 @@ static uint8_t getSynchronisationMode(uint8_t uartNum, char* syncMode)
     }
     else
     {
-        return UART_ERROR_SYNC_MODE;
+        return UART_SETUP_ERROR_SYNC_MODE;
     }
     return UART_SUCCES;
 }
@@ -479,7 +481,7 @@ static uint8_t setSynchronisationMode(uint8_t uartNum, char syncMode)
     }
     else
     {
-        return UART_ERROR_SYNC_MODE;
+        return UART_SETUP_ERROR_SYNC_MODE;
     }
     return UART_SUCCES;
 }
@@ -510,7 +512,7 @@ static uint8_t getCharacterSize(uint8_t uartNum, uint8_t* charSize)
     }
     else
     {
-        return UART_ERROR_CHAR_SIZE;
+        return UART_SETUP_ERROR_CHAR_SIZE;
     }
     return UART_SUCCES;
 }
@@ -541,7 +543,7 @@ static uint8_t setCharacterSize(uint8_t uartNum, uint8_t charSize)
     }
     else
     {
-        return UART_ERROR_CHAR_SIZE;
+        return UART_SETUP_ERROR_CHAR_SIZE;
     }
     return UART_SUCCES;
 }
@@ -558,7 +560,7 @@ static uint8_t getSpeedMode(uint8_t uartNum, char* mode)
     }
     else
     {
-        return UART_ERROR_SPEED_MODE;
+        return UART_SETUP_ERROR_SPEED_MODE;
     }
     return UART_SUCCES;
 }
@@ -575,7 +577,7 @@ static uint8_t setSpeedMode(uint8_t uartNum, char mode)
     }
     else
     {
-        return UART_ERROR_SPEED_MODE;
+        return UART_SETUP_ERROR_SPEED_MODE;
     }
     return UART_SUCCES;
 }
@@ -600,7 +602,7 @@ static uint8_t getBaudRate(uint8_t uartNum, uint32_t* baudRate)
     else
     {
         *baudRate = 0;
-        return UART_ERROR_SPEED_MODE;
+        return UART_SETUP_ERROR_SPEED_MODE;
     }
     return UART_SUCCES;
 }
@@ -609,7 +611,7 @@ static uint8_t setBaudRate(uint8_t uartNum, uint32_t baudRate)
 {
     if(baudRate < 100 || 115200 < baudRate)
     {
-        return UART_ERROR_BAUDRATE;
+        return UART_SETUP_ERROR_BAUDRATE;
     }
 
     char speedMode = '\0';
@@ -628,7 +630,7 @@ static uint8_t setBaudRate(uint8_t uartNum, uint32_t baudRate)
     }
     else
     {
-        return UART_ERROR_BAUDRATE;
+        return UART_SETUP_ERROR_BAUDRATE;
     }
 
     UBRR_H(uartNum) = (uint8_t)(UBRRValue >> 8u);
@@ -647,6 +649,26 @@ static uint8_t readFromReceiveBuffer(uint8_t uartNum, uint8_t* byte)
 {
     *byte = UDR_(uartNum);
     return UART_SUCCES;
+}
+
+static uint8_t checkReceiveError(uint8_t uartNum)
+{
+    if((UCSR_A(uartNum) & 0b00010000) == 0b00010000)
+    {
+       return UART_RECEIVE_ERROR_FRAME;
+    }
+    else if((UCSR_A(uartNum) & 0b00001000) == 0b00001000)
+    {
+        return UART_RECEIVE_ERROR_DATA_OVERRUN;
+    }
+    else if((UCSR_A(uartNum) & 0b00000100) == 0b00000100)
+    {
+        return UART_RECEIVE_ERROR_PARITY;
+    }
+    else
+    {
+        return UART_SUCCES;
+    }
 }
 
 //***************************************************************

@@ -7,17 +7,20 @@
 //***************************************************************
 // Public Defines                                               *
 //***************************************************************
-#define UART_SUCCES             0
-#define UART_ERROR_UART_NUM     1
-#define UART_ERROR_PARITY       2
-#define UART_ERROR_STOP_BITS    3
-#define UART_ERROR_SYNC_MODE    4
-#define UART_ERROR_CHAR_SIZE    5
-#define UART_ERROR_SPEED_MODE   6
-#define UART_ERROR_BAUDRATE     7
-#define UART_ERROR_BUFFER       8
-#define UART_ERROR_RECEIVE      9
-#define UART_ERROR_TRANSMIT     10
+#define UART_SUCCES                     0x00
+#define UART_SETUP_ERROR_UART_NUM       0x01
+#define UART_SETUP_ERROR_PARITY         0x02
+#define UART_SETUP_ERROR_STOP_BITS      0x03
+#define UART_SETUP_ERROR_SYNC_MODE      0x04
+#define UART_SETUP_ERROR_CHAR_SIZE      0x05
+#define UART_SETUP_ERROR_SPEED_MODE     0x06
+#define UART_SETUP_ERROR_BAUDRATE       0x07
+#define UART_BUFFER_ERROR_NOT_EMPTY     0x08
+#define UART_TRANSMIT_ERROR             0x09
+#define UART_RECEIVE_ERROR_NOT_RECEIVED 0x0A
+#define UART_RECEIVE_ERROR_FRAME        0x0B
+#define UART_RECEIVE_ERROR_DATA_OVERRUN 0x0C
+#define UART_RECEIVE_ERROR_PARITY       0x0D
 
 //***************************************************************
 // Function Pointer Declaration for callbacks                   *
