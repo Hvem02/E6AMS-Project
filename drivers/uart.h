@@ -77,15 +77,15 @@ uint8_t uartSetTransmitByteCallback(uint8_t uartNum, uartTransmitByteCallback_t 
  */
 uint8_t uartSetReceiveByteCallback(uint8_t uartNum, uartReceiveByteCallback_t callback);
 
-
 /**
  * Function for sending a single byte.
+ * This functions blocks until the byte has been sent.
  *
  * @param uartNum   Which UART is used: 0 - 3.
  * @param value     Character to be sent.
  * @return          Returns 0 on succes.
  */
-uint8_t uartSendByte(uint8_t uartNum, uint8_t value);
+uint8_t uartSendByteBlocking(uint8_t uartNum, uint8_t value);
 
 /**
  * Function for sending an array of bytes.

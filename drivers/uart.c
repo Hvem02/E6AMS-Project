@@ -199,11 +199,11 @@ uint8_t uartSetReceiveByteCallback(uint8_t uartNum, uartReceiveByteCallback_t ca
     return UART_SUCCES;
 }
 
-uint8_t uartSendByte(uint8_t uartNum, uint8_t value)
+uint8_t uartSendByteBlocking(uint8_t uartNum, uint8_t value)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
     while(uartTransmitBufferEmptied(uartNum) != UART_SUCCES);
-    UDR_(uartNum) = value;
+    addToTransmitBuffer(uartNum, value);
     return UART_SUCCES;
 }
 
@@ -653,15 +653,15 @@ static uint8_t readFromReceiveBuffer(uint8_t uartNum, uint8_t* byte)
 
 static uint8_t checkReceiveError(uint8_t uartNum)
 {
-    if((UCSR_A(uartNum) & 0b00010000) == 0b00010000)
+    if((UCSR_A(uartNum) & 0b00010000u) == 0b00010000)
     {
        return UART_RECEIVE_ERROR_FRAME;
     }
-    else if((UCSR_A(uartNum) & 0b00001000) == 0b00001000)
+    else if((UCSR_A(uartNum) & 0b00001000u) == 0b00001000)
     {
         return UART_RECEIVE_ERROR_DATA_OVERRUN;
     }
-    else if((UCSR_A(uartNum) & 0b00000100) == 0b00000100)
+    else if((UCSR_A(uartNum) & 0b00000100u) == 0b00000100)
     {
         return UART_RECEIVE_ERROR_PARITY;
     }

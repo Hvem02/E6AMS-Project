@@ -72,11 +72,11 @@ void handleCallback(uint8_t uartNum)
     uartReceiveByte(uartNum, &ch);
     if(err == UART_SUCCES)
     {
-        uartSendByte(uartNum, ch);
+        uartSendByteBlocking(uartNum, ch);
     }
     else
     {
-        uartSendByte(uartNum, 'X');
+        uartSendByteBlocking(uartNum, 'X');
     }
     _delay_ms(100);
 }
@@ -87,9 +87,9 @@ void testProgramSoren(void)
 
     //uartSetTransmitBufferEmptyCallback(0, handleCallback);
 
-    for(char i = 'A'; i <= 'Z'; i++)
+    for(uint8_t i = 'A'; i <= 'Z'; i++)
     {
-        uartSendByte(0, i);
+        uartSendByteBlocking(0, i);
         _delay_ms(100);
     }
     uartSetReceiveByteCallback(0, handleCallback);
