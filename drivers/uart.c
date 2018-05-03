@@ -203,8 +203,7 @@ uint8_t uartSendByte(uint8_t uartNum, uint8_t value)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
     RETURN_ON_ERROR(uartTransmitBufferEmptied(uartNum));
-    addToTransmitBuffer(uartNum, value);
-    return UART_SUCCES;
+    return addToTransmitBuffer(uartNum, value);
 }
 
 uint8_t uartSendByteArray(uint8_t uartNum, uint8_t const * array, uint16_t size)
@@ -228,8 +227,7 @@ uint8_t uartSendString(uint8_t uartNum, char const * string)
         string++;
     }
     while(uartTransmitBufferEmptied(uartNum) != UART_SUCCES);
-    addToTransmitBuffer(uartNum, '\0');
-    return UART_SUCCES;
+    return addToTransmitBuffer(uartNum, '\0');
 }
 
 uint8_t uartSendInteger(uint8_t uartNum, int16_t value, uint8_t base)
@@ -237,8 +235,7 @@ uint8_t uartSendInteger(uint8_t uartNum, int16_t value, uint8_t base)
     RETURN_ON_ERROR(validateUartNumber(uartNum));
     uint8_t buffer[16 + 3];
     itoa(value, (char*)buffer, base);
-    uartSendString(0, (char*)buffer);
-    return UART_SUCCES;
+    return uartSendString(0, (char*)buffer);
 }
 
 uint8_t uartReceiveByte(uint8_t uartNum, uint8_t* valuePtr)
@@ -246,8 +243,7 @@ uint8_t uartReceiveByte(uint8_t uartNum, uint8_t* valuePtr)
     RETURN_ON_ERROR(validateUartNumber(uartNum));
     RETURN_ON_ERROR(uartByteReceived(uartNum));
     RETURN_ON_ERROR(checkReceiveError(uartNum));
-    readFromReceiveBuffer(uartNum, valuePtr);
-    return UART_SUCCES;
+    return readFromReceiveBuffer(uartNum, valuePtr);
 }
 
 uint8_t uartTransmitBufferEmptied(uint8_t uartNum)
@@ -673,6 +669,7 @@ ISR(USART ## UART_NUM ## _TX_vect)                          \
     {                                                       \
         transmitByteCallback[(UART_NUM)]((UART_NUM));       \
     }                                                       \
+    UCSR_A(UART_NUM) |= 0b01000000;                         \
 }
 
 // Macro function for receive byte ISR
@@ -683,6 +680,7 @@ ISR(USART ## UART_NUM ## _RX_vect)                          \
     {                                                       \
         receiveByteCallback[(UART_NUM)]((UART_NUM));        \
     }                                                       \
+    (void)UDR_(UART_NUM);                                   \
 }
 
 // Macro function for all UART ISR's
