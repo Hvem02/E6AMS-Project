@@ -212,7 +212,7 @@ uint8_t uartSendByteArray(uint8_t uartNum, uint8_t const * array, uint16_t size)
     for(uint16_t i = 0; i < size; i++)
     {
         while(uartTransmitBufferEmptied(uartNum) != UART_SUCCES);
-        addToTransmitBuffer(uartNum, array[i]);
+        RETURN_ON_ERROR(addToTransmitBuffer(uartNum, array[i]));
     }
     return UART_SUCCES;
 }
@@ -223,7 +223,7 @@ uint8_t uartSendString(uint8_t uartNum, char const * string)
     while(*string != '\0')
     {
         while(uartTransmitBufferEmptied(uartNum) != UART_SUCCES);
-        addToTransmitBuffer(uartNum, (uint8_t)*string);
+        RETURN_ON_ERROR(addToTransmitBuffer(uartNum, (uint8_t)*string));
         string++;
     }
     while(uartTransmitBufferEmptied(uartNum) != UART_SUCCES);
