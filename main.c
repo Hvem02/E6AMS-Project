@@ -32,6 +32,8 @@
 #include "drivers/uart.h"
 #include "drivers/hm-10.h"
 
+ISR(__vector_default){};
+
 void mainProgram(void);
 void testProgramAlex(void);
 void testProgramSoren(void);
