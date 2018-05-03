@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 //***************************************************************
-// Public Defines                                               *
+// Error return values                                          *
 //***************************************************************
 #define UART_SUCCES                     0x00
 #define UART_SETUP_ERROR_UART_NUM       0x01
@@ -21,6 +21,11 @@
 #define UART_RECEIVE_ERROR_FRAME        0x0B
 #define UART_RECEIVE_ERROR_DATA_OVERRUN 0x0C
 #define UART_RECEIVE_ERROR_PARITY       0x0D
+
+//***************************************************************
+// Public Macro Functions                                       *
+//***************************************************************
+#define UART_BLOCKING(EXPRESSION) while(EXPRESSION != UART_SUCCES)
 
 //***************************************************************
 // Function Pointer Declaration for callbacks                   *
