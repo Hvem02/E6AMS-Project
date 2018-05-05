@@ -65,8 +65,7 @@ bool sendWithResponse(const char* message, char* buffer) {
             uartSendString(DEBUG_UART, "Success; ");
             uartSendInteger(DEBUG_UART, response, 10);
         } else if (success == HM_10_ERROR_TIMEOUT) {
-                // Timeout error
-//            uartSendString(debugUART, timeoutError);
+            // Timeout error
             buffer[i] = '\0';
             int equals = strcmp(responseOK, buffer); // If 0, they are the same, less than will be a substring, greater than is false
 

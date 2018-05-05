@@ -41,8 +41,8 @@ void testProgramSoren(void);
 int main()
 {
     //mainProgram();
-    //testProgramAlex();
-    testProgramSoren();
+    testProgramAlex();
+//    testProgramSoren();
 }
 
 void mainProgram(void)
