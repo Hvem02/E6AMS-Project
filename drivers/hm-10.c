@@ -29,9 +29,22 @@ const char* responseFAILED = "FAILED";
 //***************************************************************
 // Public Function Implementation                               *
 //***************************************************************
+
+void rcvByteCallback(uint8_t uartNumber) {
+    uint8_t rcv;
+    uint8_t success = uartReceiveByte(uartNumber, &rcv);
+
+    uartSendString(DEBUG_UART, "Received the following: ");
+    uartSendByte(DEBUG_UART, rcv);
+    uartSendString(DEBUG_UART, " With the following return code: ");
+    uartSendByte(DEBUG_UART, success);
+    uartSendString(DEBUG_UART, "\r\n");
+}
+
 void hm10Init(void)
 {
     uartInit(HM_10_UART, HM_10_BAUDRATE, 'D', HM_10_PARITY_BITS, HM_10_DATABITS, 'N');
+    uartSetReceiveByteCallback(HM_10_UART, rcvByteCallback);
     uartSendString(HM_10_UART, atTest);
     uartSendString(HM_10_UART, atTest);
     uartSendString(HM_10_UART, atTest);
@@ -55,7 +68,9 @@ bool sendWithResponse(const char* message, char* buffer) {
     uartSendString(DEBUG_UART, message);
 
     uartSendString(HM_10_UART, message);
-    int i = 0;
+    buffer[0] = 'a';
+    return true;
+    /*int i = 0;
 
     while (1) {
         uint8_t response;
@@ -76,7 +91,7 @@ bool sendWithResponse(const char* message, char* buffer) {
         }
 
         buffer[i++] = response;
-    }
+    }*/
 }
 
 uint8_t readCharWithDelay(uint8_t uartNum, uint8_t* retVal)

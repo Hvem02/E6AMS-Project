@@ -45,4 +45,7 @@ bool hm10Ready();
  */
 uint8_t readCharWithDelay(uint8_t uartNum, uint8_t* retVal);
 
+
+
+
 #endif // MH_10_H
