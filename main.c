@@ -41,8 +41,8 @@ void testProgramSoren(void);
 int main()
 {
     //mainProgram();
-    testProgramAlex();
-//    testProgramSoren();
+    //testProgramAlex();
+    testProgramSoren();
 }
 
 void mainProgram(void)
@@ -66,18 +66,27 @@ void testProgramAlex(void)
     }
 }
 
+uint8_t buffer[100] = {0};
+uint8_t counter = 0;
+
+void uartHandler(uint8_t uartNum)
+{
+    uint8_t ch = 0;
+    uartReceiveByte(uartNum, &ch);
+    uartSendByte(uartNum, ch);
+}
+
 void testProgramSoren(void)
 {
     uartInit(0, 115200, 'E', 1, 8, 'N');
+    //uartInit(1, 9600, 'D', 1, 8, 'N');
 
-    for(uint8_t i = 'A'; i <= 'C'; i++)
-    {
-        while(uartSendByte(0, i) != UART_SUCCES);
-        _delay_ms(100);
-    }
-    uartSendByte(0, '-');
+    uartSendString(0, "Test\n\r");
 
+    uartSetReceiveByteCallback(0, uartHandler);
     sei();
+
     while(1)
-    {}
+    {
+    }
 }
