@@ -27,9 +27,12 @@
 
 #include <avr/io.h>
 #include <util/delay.h>
+#include <avr/interrupt.h>
 
 #include "drivers/uart.h"
 #include "drivers/hm-10.h"
+
+ISR(__vector_default){};
 
 void mainProgram(void);
 void testProgramAlex(void);
@@ -38,8 +41,8 @@ void testProgramSoren(void);
 int main()
 {
     //mainProgram();
-    testProgramAlex();
-    //testProgramSoren();
+    //testProgramAlex();
+    testProgramSoren();
 }
 
 void mainProgram(void)
@@ -55,10 +58,26 @@ void testProgramAlex(void)
     while(1)
     {
         _delay_ms(1000);
+        uint8_t c[3] = {0};
+        //uartReceiveByteArray(0, c, 3);
+        uartSendByteArray(0, c, 3);
+        hm10Ready();
+        _delay_ms(10);
     }
 }
 
 void testProgramSoren(void)
 {
+    uartInit(0, 115200, 'E', 1, 8, 'N');
 
+    for(uint8_t i = 'A'; i <= 'C'; i++)
+    {
+        while(uartSendByte(0, i) != UART_SUCCES);
+        _delay_ms(100);
+    }
+    uartSendByte(0, '-');
+
+    sei();
+    while(1)
+    {}
 }

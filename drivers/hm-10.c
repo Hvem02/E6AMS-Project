@@ -11,6 +11,7 @@
 #define HM_10_START_BITS    1
 #define HM_10_STOP_BITS     1
 
+#define HM_10_ERROR_TIMEOUT 10
 
 const char* timeoutError = "I did not receive a char within the 10 ms timeout\r\n";
 const char* atTest = "AT";
@@ -59,12 +60,11 @@ bool sendWithResponse(const char* message, char* buffer) {
     while (1) {
         uint8_t response;
         uint8_t success = readCharWithDelay(HM_10_UART, &response);
-//        uint8_t success = uartReceiveByte(hm10UART, &response);
 
         if (success == UART_SUCCES) {
             uartSendString(DEBUG_UART, "Success; ");
             uartSendInteger(DEBUG_UART, response, 10);
-        } else if (success == UART_ERROR_TIMEOUT) {
+        } else if (success == HM_10_ERROR_TIMEOUT) {
                 // Timeout error
 //            uartSendString(debugUART, timeoutError);
             buffer[i] = '\0';
@@ -93,7 +93,7 @@ uint8_t readCharWithDelay(uint8_t uartNum, uint8_t* retVal)
         }
         _delay_ms(waitTime);
     }
-    return UART_ERROR_TIMEOUT;
+    return HM_10_ERROR_TIMEOUT;
 }
 //***************************************************************
 // Static Function Implementation                               *
