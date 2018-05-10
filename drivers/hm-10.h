@@ -16,7 +16,8 @@
 /**
  *
  */
-void hm10Init(void);
+uint8_t hm10Init(void);
+
 
 
 /**
