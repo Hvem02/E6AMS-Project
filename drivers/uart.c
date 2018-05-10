@@ -203,6 +203,8 @@ uint8_t uartSendByte(uint8_t uartNum, uint8_t value)
 {
     RETURN_ON_ERROR(validateUartNumber(uartNum));
     RETURN_ON_ERROR(uartTransmitBufferEmptied(uartNum));
+    while(uartTransmitBufferEmptied(uartNum) != UART_SUCCES);
+
     return addToTransmitBuffer(uartNum, value);
 }
 
@@ -226,8 +228,9 @@ uint8_t uartSendString(uint8_t uartNum, char const * string)
         RETURN_ON_ERROR(addToTransmitBuffer(uartNum, (uint8_t)*string));
         string++;
     }
-    while(uartTransmitBufferEmptied(uartNum) != UART_SUCCES);
-    return addToTransmitBuffer(uartNum, '\0');
+//    while(uartTransmitBufferEmptied(uartNum) != UART_SUCCES);
+//    return addToTransmitBuffer(uartNum, '\0');
+    return UART_SUCCES;
 }
 
 uint8_t uartSendInteger(uint8_t uartNum, int16_t value, uint8_t base)

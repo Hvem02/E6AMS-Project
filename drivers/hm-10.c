@@ -17,6 +17,9 @@ const char* timeoutError = "I did not receive a char within the 10 ms timeout\r\
 const char* atTest = "AT";
 const char* responseOK = "OK";
 const char* responseFAILED = "FAILED";
+
+char rcvBuffer[255] = {0};
+uint8_t rcvIndex = 0;
 //***************************************************************
 // Macro Functions                                              *
 //***************************************************************
@@ -30,15 +33,42 @@ const char* responseFAILED = "FAILED";
 // Public Function Implementation                               *
 //***************************************************************
 
+bool waitingForStatus = false;
+bool isSetup = false;
+
 void rcvByteCallback(uint8_t uartNumber) {
     uint8_t rcv;
     uint8_t success = uartReceiveByte(uartNumber, &rcv);
 
-    uartSendString(DEBUG_UART, "Received the following: ");
-    uartSendByte(DEBUG_UART, rcv);
-    uartSendString(DEBUG_UART, " With the following return code: ");
-    uartSendByte(DEBUG_UART, success);
-    uartSendString(DEBUG_UART, "\r\n");
+    if (success != UART_SUCCES) {
+        uartSendString(DEBUG_UART, "Failed to read when interrupted with error: ");
+        uartSendInteger(DEBUG_UART, success, 10);
+        uartSendString(DEBUG_UART, "\r\n");
+        return;
+    }
+
+    rcvBuffer[rcvIndex++] = rcv;
+
+    if (rcvIndex > 1) {
+        // At least two bytes are present, hence OK could be possible
+
+        int equalsOK = strcmp(responseOK, rcvBuffer); // If 0, they are the same, less than will be a substring, greater than is false
+
+        if (equalsOK <= 0) {
+            // It's an substring, everything is good
+
+        } else {
+            // Not an substring
+            int equalsFAIL = strcmp(responseFAILED, rcvBuffer);
+
+            if (equalsFAIL == 0) {
+                // The command failed
+            } else {
+                // Another type command, as
+            }
+
+        }
+    }
 }
 
 void hm10Init(void)
@@ -46,9 +76,20 @@ void hm10Init(void)
     uartInit(HM_10_UART, HM_10_BAUDRATE, 'D', HM_10_PARITY_BITS, HM_10_DATABITS, 'N');
     uartSetReceiveByteCallback(HM_10_UART, rcvByteCallback);
     uartSendString(HM_10_UART, atTest);
+    for (int i = 0; i < 100; ++i) {
+        _delay_ms(16);
+    }
     uartSendString(HM_10_UART, atTest);
+    for (int i = 0; i < 100; ++i) {
+        _delay_ms(16);
+    }
     uartSendString(HM_10_UART, atTest);
-    while (hm10Ready() == false);
+
+    while (isSetup == false) {
+        for (int i = 0; i < 100; ++i) {
+            _delay_ms(16);
+        }
+    }
 
     uartSendString(DEBUG_UART, "Done setup hm10!");
 }
@@ -56,8 +97,8 @@ void hm10Init(void)
 bool hm10Ready() {
     char buffer[20] = {0};
     bool response = sendWithResponse(atTest, buffer);
-    uartSendString(DEBUG_UART, "Received the following to compare with OK: ");
-    uartSendString(DEBUG_UART, buffer);
+//    uartSendString(DEBUG_UART, "Received the following to compare with OK: ");
+//    uartSendString(DEBUG_UART, buffer);
 
     return response;
 }
@@ -66,10 +107,9 @@ bool sendWithResponse(const char* message, char* buffer) {
 
     uartSendString(DEBUG_UART, "Sending the following:");
     uartSendString(DEBUG_UART, message);
-
+    buffer[0] = 'a'; // TODO remove this temp hack
     uartSendString(HM_10_UART, message);
-    buffer[0] = 'a';
-    return true;
+    return isSetup;
     /*int i = 0;
 
     while (1) {
