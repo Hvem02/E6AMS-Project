@@ -41,8 +41,8 @@ void testProgramSoren(void);
 int main()
 {
     //mainProgram();
-    //testProgramAlex();
-    testProgramSoren();
+    testProgramAlex();
+//    testProgramSoren();
 }
 
 void mainProgram(void)
@@ -53,16 +53,16 @@ void mainProgram(void)
 void testProgramAlex(void)
 {
     uartInit(0, 115200, 'O', 1, 8, 'N');
+    sei();
     hm10Init();
 
     while(1)
     {
-        _delay_ms(1000);
+        _delay_ms(1000);/*
         uint8_t c[3] = {0};
-        //uartReceiveByteArray(0, c, 3);
         uartSendByteArray(0, c, 3);
         hm10Ready();
-        _delay_ms(10);
+        _delay_ms(10);*/
     }
 }
 
@@ -71,9 +71,12 @@ uint8_t counter = 0;
 
 void uartHandler(uint8_t uartNum)
 {
+    uartSendString(0, "Got the following: ");
     uint8_t ch = 0;
     uartReceiveByte(uartNum, &ch);
     uartSendByte(uartNum, ch);
+    uartSendString(0, "Test: ");
+    uartSendByte(0, '0');
 }
 
 void testProgramSoren(void)
@@ -83,8 +86,8 @@ void testProgramSoren(void)
 
     uartSendString(0, "Test\n\r");
 
-    uartSetReceiveByteCallback(0, uartHandler);
     sei();
+    uartSetReceiveByteCallback(0, uartHandler);
 
     while(1)
     {

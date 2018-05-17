@@ -12,11 +12,19 @@
 #define HM_10_STOP_BITS     1
 
 #define HM_10_ERROR_TIMEOUT 10
+#define BUFFER_SIZE 257
+#define SET_LEN 7
 
 const char* timeoutError = "I did not receive a char within the 10 ms timeout\r\n";
 const char* atTest = "AT";
 const char* responseOK = "OK";
 const char* responseFAILED = "FAILED";
+
+char rcvBuffer[BUFFER_SIZE] = {0};
+//char cmdBuffer[BUFFER_SIZE] = {0};
+uint8_t rcvIndex = 0;
+uint8_t cmdIndex = 0;
+
 //***************************************************************
 // Macro Functions                                              *
 //***************************************************************
@@ -29,71 +37,167 @@ const char* responseFAILED = "FAILED";
 //***************************************************************
 // Public Function Implementation                               *
 //***************************************************************
-void hm10Init(void)
-{
-    uartInit(HM_10_UART, HM_10_BAUDRATE, 'D', HM_10_PARITY_BITS, HM_10_DATABITS, 'N');
-    uartSendString(HM_10_UART, atTest);
-    uartSendString(HM_10_UART, atTest);
-    uartSendString(HM_10_UART, atTest);
-    while (hm10Ready() == false);
+
+
+enum states {
+    pre_init,
+    init,
+    command,
+    fw_upload
+};
+
+enum settings {
+//    baud,
+//    name,
+    par,
+    noti,
+    done
+};
+
+enum states currentState;
+enum settings currentSettingState;
+//int newData = 0;
+
+void rcvByteCallback(uint8_t uartNumber) {
+    uint8_t rcv;
+//    uint8_t success = uartReceiveByte(uartNumber, &rcv);
+    uartReceiveByte(uartNumber, &rcv);
+
+    /*
+    if (success != UART_SUCCES) {
+        uartSendString(DEBUG_UART, "Failed to read when interrupted with error: ");
+        uartSendInteger(DEBUG_UART, success, 10);
+        uartSendString(DEBUG_UART, "\r\n");
+        return;
+    }*/
+
+    rcvBuffer[rcvIndex++] = rcv;
+//    newData += 1;
+}
+
+/*char* getStringBasedOffState() {
+    if (currentState == pre_init) {
+        return "OK";
+    }
+
+    return "SET";
+}*/
+
+
+uint8_t hm10Init(void) {
+    uartSendString(DEBUG_UART, "Starting setup\n");
+    currentState = pre_init;
+    currentSettingState = noti;
+
+    // Init communications
+    uint8_t success = uartInit(HM_10_UART, HM_10_BAUDRATE, 'D', HM_10_PARITY_BITS, HM_10_DATABITS, 'N');
+
+    if (success != UART_SUCCES) {
+        uartSendString(DEBUG_UART, "Failed to setup uart for HM-10");
+        return success;
+    }
+
+    success = uartSetReceiveByteCallback(HM_10_UART, rcvByteCallback);
+
+    if (success != UART_SUCCES) {
+        uartSendString(DEBUG_UART, "Failed to setup callback for HM-10");
+        return success;
+    }
+
+
+    // Check that the HM-10 is ready to receive commands
+
+    while (currentState != command) {
+
+        // TODO Think about removing newData variable and instead exploit the index the buffer uses
+
+        // Handle read of data
+//        if (newData > 2) {
+
+            char* index = strstr(&rcvBuffer[cmdIndex], "OK");
+
+            if (index != NULL) {
+                // Not null, hence what we asked for is in the buffer
+                switch (currentState) {
+                    case pre_init:
+                        uartSendString(DEBUG_UART, "In pre\n");
+//                        newData -= 2;
+                        cmdIndex = (uint8_t) ((rcvBuffer-index) + 2);
+                        currentState = init;
+                        break;
+                    case init:
+                        switch (currentSettingState) {
+                            case par:
+                                uartSendString(DEBUG_UART, "par\n");
+                                cmdIndex = (uint8_t) ((rcvBuffer-index) + SET_LEN);
+//                                newData -= SET_LEN;
+                                currentSettingState = noti;
+                                break;
+                            case noti:
+                                uartSendString(DEBUG_UART, "noti\n");
+                                cmdIndex = (uint8_t) ((rcvBuffer-index) + SET_LEN);
+//                                newData -= SET_LEN;
+                                currentSettingState = done;
+                                break;
+                            case done:
+                                uartSendString(DEBUG_UART, "done\n");
+                                cmdIndex = (uint8_t) ((rcvBuffer-index) + SET_LEN);
+//                                newData -= SET_LEN;
+                                currentState = command;
+                                break;
+                            default:
+                                uartSendString(DEBUG_UART, "Default\n");
+                                break;
+                        }
+                        break;
+                    default:
+                        uartSendString(DEBUG_UART, "Default2\n");
+                        break;
+                }
+//            }
+        }
+
+        // Handle send of strings based of the state
+        switch (currentState) {
+            case pre_init:
+//                uartSendString(DEBUG_UART, "Sending AT\n");
+                uartSendString(HM_10_UART, atTest);
+                break;
+            case init:
+                switch (currentSettingState) {
+                    case par:
+                        uartSendString(DEBUG_UART, "Sending par\n");
+                        uartSendString(HM_10_UART, "AT+PARI1");
+                        break;
+                    case noti:
+//                        uartSendString(DEBUG_UART, "Sending NOTI\n");
+                        uartSendString(HM_10_UART, "AT+NOTI1");
+                        break;
+                    case done:
+                        uartSendString(DEBUG_UART, "Done\n");
+                        currentState = command;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
+        _delay_ms(16);
+        _delay_ms(16);
+        _delay_ms(16);
+    }
 
     uartSendString(DEBUG_UART, "Done setup hm10!");
+
+    return 0;
 }
 
 bool hm10Ready() {
-    char buffer[20] = {0};
-    bool response = sendWithResponse(atTest, buffer);
-    uartSendString(DEBUG_UART, "Received the following to compare with OK: ");
-    uartSendString(DEBUG_UART, buffer);
-
-    return response;
+    return (currentState == command)? true:false;
 }
 
-bool sendWithResponse(const char* message, char* buffer) {
-
-    uartSendString(DEBUG_UART, "Sending the following:");
-    uartSendString(DEBUG_UART, message);
-
-    uartSendString(HM_10_UART, message);
-    int i = 0;
-
-    while (1) {
-        uint8_t response;
-        uint8_t success = readCharWithDelay(HM_10_UART, &response);
-
-        if (success == UART_SUCCES) {
-            uartSendString(DEBUG_UART, "Success; ");
-            uartSendInteger(DEBUG_UART, response, 10);
-        } else if (success == HM_10_ERROR_TIMEOUT) {
-            // Timeout error
-            buffer[i] = '\0';
-            int equals = strcmp(responseOK, buffer); // If 0, they are the same, less than will be a substring, greater than is false
-
-            if (equals <= 0) {
-                return true;
-            }
-            return false;
-        }
-
-        buffer[i++] = response;
-    }
-}
-
-uint8_t readCharWithDelay(uint8_t uartNum, uint8_t* retVal)
-{
-    uint8_t totalBits = (HM_10_DATABITS + HM_10_PARITY_BITS + HM_10_START_BITS + HM_10_STOP_BITS);
-    double waitTime = (((double)totalBits / (double)HM_10_BAUDRATE) * (double)1000000);
-    for(uint8_t i = 0; i < 10; i++)
-    {
-        if(uartByteReceived(uartNum) == UART_SUCCES)
-        {
-            uartReceiveByte(uartNum, retVal);
-            return UART_SUCCES;
-        }
-        _delay_ms(waitTime);
-    }
-    return HM_10_ERROR_TIMEOUT;
-}
 //***************************************************************
 // Static Function Implementation                               *
 //***************************************************************

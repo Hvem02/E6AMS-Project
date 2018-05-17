@@ -16,7 +16,8 @@
 /**
  *
  */
-void hm10Init(void);
+uint8_t hm10Init(void);
+
 
 
 /**
@@ -44,5 +45,8 @@ bool hm10Ready();
  * @return          UART return values
  */
 uint8_t readCharWithDelay(uint8_t uartNum, uint8_t* retVal);
+
+
+
 
 #endif // MH_10_H
