@@ -16,5 +16,5 @@ SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
-set(SOURCE_FILES main.c drivers/uart.c drivers/uart.h drivers/hm-10.c drivers/hm-10.h)
+set(SOURCE_FILES main.c drivers/uart.c drivers/uart.h drivers/hm-10.c drivers/hm-10.h drivers/buttonInterface.c drivers/buttonInterface.h)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
