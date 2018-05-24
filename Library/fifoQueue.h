@@ -14,12 +14,12 @@
 /**
  *
  */
-typedef struct FifoQueue
+typedef struct
 {
-    uint8_t* const buffer;      /** Pointer to buffer. */
-    uint16_t const bufferSize;  /** Size of the buffer. */
-    uint16_t nextIndex;         /** Index of next available buffer index */
-    uint16_t usedSize;          /** Size of the used part of buffer. */
+    uint8_t* buffer;        /** Pointer to buffer. */
+    uint16_t bufferSize;    /** Size of the buffer. */
+    uint16_t nextIndex;     /** Index of next available buffer index */
+    uint16_t usedSize;      /** Size of the used part of buffer. */
 } FifoQueue;
 
 /**
@@ -28,7 +28,7 @@ typedef struct FifoQueue
  * @param size      The size of the buffer.
  * @return          Returns 0 on succes.
  */
-FifoQueue fifoInit(uint8_t* const buffer, uint16_t size);
+FifoQueue fifoInit(uint8_t* buffer, uint16_t size);
 
 /**
  *
@@ -67,7 +67,7 @@ uint8_t fill(FifoQueue* queue, uint8_t fillValue);
  * @param retVal    Pointer to where value should be returned to.
  * @return          Returns 0 on succes.
  */
-uint8_t peak(FifoQueue const * queue, uint8_t* retValue);
+uint8_t peak(FifoQueue * queue, uint8_t* retValue);
 
 /**
  *
@@ -76,6 +76,6 @@ uint8_t peak(FifoQueue const * queue, uint8_t* retValue);
  * @param peakIndex Index of the value wished to be peaked.
  * @return          Returns 0 on succes.
  */
-uint8_t peakAt(FifoQueue const * queue, uint8_t* retValue, uint16_t peakIndex);
+uint8_t peakAt(FifoQueue * queue, uint8_t* retValue, uint16_t peakIndex);
 
 #endif //FIFOQUEUE_H

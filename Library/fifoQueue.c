@@ -16,16 +16,16 @@ do                                  \
 //***************************************************************
 // Static Function Declaration                                  *
 //***************************************************************
-static uint8_t isFull(FifoQueue const * queue);
-static uint8_t isEmpty(FifoQueue const * queue);
+static uint8_t isFull(FifoQueue * queue);
+static uint8_t isEmpty(FifoQueue * queue);
 
-static uint16_t head(FifoQueue const * queue);
-static uint16_t tail(FifoQueue const * queue);
+static uint16_t head(FifoQueue * queue);
+static uint16_t tail(FifoQueue * queue);
 
 //***************************************************************
 // Public Function Implementation                               *
 //***************************************************************
-FifoQueue fifoInit(uint8_t* const buffer, uint16_t size)
+FifoQueue fifoInit(uint8_t* buffer, uint16_t size)
 {
     FifoQueue fifo =
     {
@@ -71,12 +71,12 @@ uint8_t fill(FifoQueue* queue, uint8_t fillValue)
     return FIFO_SUCCES;
 }
 
-uint8_t peak(FifoQueue const * queue, uint8_t* retValue)
+uint8_t peak(FifoQueue * queue, uint8_t* retValue)
 {
     return peakAt(queue, retValue, 0);
 }
 
-uint8_t peakAt(FifoQueue const * queue, uint8_t* retValue, uint16_t peakIndex)
+uint8_t peakAt(FifoQueue * queue, uint8_t* retValue, uint16_t peakIndex)
 {
     RETURN_ON_ERROR(isEmpty(queue));
     if(peakIndex >= queue->usedSize)
@@ -92,7 +92,7 @@ uint8_t peakAt(FifoQueue const * queue, uint8_t* retValue, uint16_t peakIndex)
 //***************************************************************
 // Static Function Implementation                               *
 //***************************************************************
-static uint8_t isFull(FifoQueue const * queue)
+static uint8_t isFull(FifoQueue * queue)
 {
     if(queue->usedSize == queue->bufferSize)
     {
@@ -104,7 +104,7 @@ static uint8_t isFull(FifoQueue const * queue)
     }
 }
 
-static uint8_t isEmpty(FifoQueue const * queue)
+static uint8_t isEmpty(FifoQueue * queue)
 {
     if(queue->usedSize == 0)
     {
@@ -116,12 +116,12 @@ static uint8_t isEmpty(FifoQueue const * queue)
     }
 }
 
-static uint16_t head(FifoQueue const * queue)
+static uint16_t head(FifoQueue * queue)
 {
     return (queue->nextIndex + queue->usedSize) % queue->bufferSize;
 }
 
-static uint16_t tail(FifoQueue const * queue)
+static uint16_t tail(FifoQueue * queue)
 {
     return ((queue->bufferSize - queue->usedSize) + queue->nextIndex) % queue->bufferSize;
 }
