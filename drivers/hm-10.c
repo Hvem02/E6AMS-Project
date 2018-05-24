@@ -4,7 +4,7 @@
 #include "uart.h"
 
 #define DEBUG_UART          0
-#define HM_10_UART          1
+#define HM_10_UART          3
 #define HM_10_BAUDRATE      9600
 #define HM_10_PARITY_BITS   1
 #define HM_10_DATABITS      8
