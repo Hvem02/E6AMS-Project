@@ -21,7 +21,7 @@ const char* responseOK = "OK";
 const char* responseFAILED = "FAILED";
 
 char rcvBuffer[BUFFER_SIZE] = {0};
-//char cmdBuffer[BUFFER_SIZE] = {0};
+
 uint8_t rcvIndex = 0;
 uint8_t cmdIndex = 0;
 
@@ -56,32 +56,13 @@ enum settings {
 
 enum states currentState;
 enum settings currentSettingState;
-//int newData = 0;
 
 void rcvByteCallback(uint8_t uartNumber) {
     uint8_t rcv;
-//    uint8_t success = uartReceiveByte(uartNumber, &rcv);
     uartReceiveByte(uartNumber, &rcv);
-
-    /*
-    if (success != UART_SUCCES) {
-        uartSendString(DEBUG_UART, "Failed to read when interrupted with error: ");
-        uartSendInteger(DEBUG_UART, success, 10);
-        uartSendString(DEBUG_UART, "\r\n");
-        return;
-    }*/
-
     rcvBuffer[rcvIndex++] = rcv;
-//    newData += 1;
 }
 
-/*char* getStringBasedOffState() {
-    if (currentState == pre_init) {
-        return "OK";
-    }
-
-    return "SET";
-}*/
 
 
 uint8_t hm10Init(void) {
@@ -112,55 +93,48 @@ uint8_t hm10Init(void) {
         // TODO Think about removing newData variable and instead exploit the index the buffer uses
 
         // Handle read of data
-//        if (newData > 2) {
 
-            char* index = strstr(&rcvBuffer[cmdIndex], "OK");
+        char* index = strstr(&rcvBuffer[cmdIndex], "OK");
 
-            if (index != NULL) {
-                // Not null, hence what we asked for is in the buffer
-                switch (currentState) {
-                    case pre_init:
-                        uartSendString(DEBUG_UART, "In pre\n");
-//                        newData -= 2;
-                        cmdIndex = (uint8_t) ((rcvBuffer-index) + 2);
-                        currentState = init;
-                        break;
-                    case init:
-                        switch (currentSettingState) {
-                            case par:
-                                uartSendString(DEBUG_UART, "par\n");
-                                cmdIndex = (uint8_t) ((rcvBuffer-index) + SET_LEN);
-//                                newData -= SET_LEN;
-                                currentSettingState = noti;
-                                break;
-                            case noti:
-                                uartSendString(DEBUG_UART, "noti\n");
-                                cmdIndex = (uint8_t) ((rcvBuffer-index) + SET_LEN);
-//                                newData -= SET_LEN;
-                                currentSettingState = done;
-                                break;
-                            case done:
-                                uartSendString(DEBUG_UART, "done\n");
-                                cmdIndex = (uint8_t) ((rcvBuffer-index) + SET_LEN);
-//                                newData -= SET_LEN;
-                                currentState = command;
-                                break;
-                            default:
-                                uartSendString(DEBUG_UART, "Default\n");
-                                break;
-                        }
-                        break;
-                    default:
-                        uartSendString(DEBUG_UART, "Default2\n");
-                        break;
-                }
-//            }
+        if (index != NULL) {
+            // Not null, hence what we asked for is in the buffer
+            switch (currentState) {
+                case pre_init:
+                    uartSendString(DEBUG_UART, "In pre\n");
+                    cmdIndex = (uint8_t) ((rcvBuffer-index) + 2);
+                    currentState = init;
+                    break;
+                case init:
+                    switch (currentSettingState) {
+                        case par:
+                            uartSendString(DEBUG_UART, "par\n");
+                            cmdIndex = (uint8_t) ((rcvBuffer-index) + SET_LEN);
+                            currentSettingState = noti;
+                            break;
+                        case noti:
+                            uartSendString(DEBUG_UART, "noti\n");
+                            cmdIndex = (uint8_t) ((rcvBuffer-index) + SET_LEN);
+                            currentSettingState = done;
+                            break;
+                        case done:
+                            uartSendString(DEBUG_UART, "done\n");
+                            cmdIndex = (uint8_t) ((rcvBuffer-index) + SET_LEN);
+                            currentState = command;
+                            break;
+                        default:
+                            uartSendString(DEBUG_UART, "Default\n");
+                            break;
+                    }
+                    break;
+                default:
+                    uartSendString(DEBUG_UART, "Default2\n");
+                    break;
+            }
         }
 
         // Handle send of strings based of the state
         switch (currentState) {
             case pre_init:
-//                uartSendString(DEBUG_UART, "Sending AT\n");
                 uartSendString(HM_10_UART, atTest);
                 break;
             case init:

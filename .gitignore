@@ -74,6 +74,7 @@ dkms.conf
 # CMake
 cmake-build-debug/
 cmake-build-release/
+cmake-build-minsizerel/
 
 # Mongo Explorer plugin
 .idea/**/mongoSettings.xml
@@ -101,3 +102,4 @@ fabric.properties
 
 # Editor-based Rest Client
 .idea/httpRequests
+
