@@ -1,10 +1,35 @@
 #ifndef BUTTON_INTERFACE_H
 #define BUTTON_INTERFACE_H
 
+#define BUTTON_COUNT        4
+
+//***************************************************************
+// Enums                                                        *
+//***************************************************************
+/**
+ *  Enum for buttom number.
+ */
+typedef enum
+{
+    UP    = 0,
+    RIGHT = 1,
+    DOWN  = 2,
+    LEFT  = 3,
+} button_t;
+
+/**
+ * Enum for event type number.
+ */
+typedef enum
+{
+    PUSH    = 0,
+    RELEASE = 1,
+} event_t;
+
 //***************************************************************
 // Function Pointer Declaration for callbacks                   *
 //***************************************************************
-typedef void (* buttonCallback_t)(void);
+typedef void (* buttonCallback_t)(uint8_t buttonNumber);
 
 //***************************************************************
 // Public Function Definitions                                  *
@@ -12,62 +37,16 @@ typedef void (* buttonCallback_t)(void);
 /**
  * Function for initialising the button interface.
  */
-void buttonInterfaceInit(void);
+void buttonInit(void);
 
 /**
- * Function for adding handler function for the UP button being pushed.
- * To remove the handler function, call this function with a NULL pointer.
- * @param callbackFunc
+ * Function used to register callback function for when buttom is pressed or released.
+ * To unregister the callback function, register NULL instead.
+ *
+ * @param button        Enum for which button to use.
+ * @param event         Enum for push or release event.
+ * @param callbackFunc  Callback function to be called when buttom is pressed or released.
  */
-void buttonSetUpPushCallback(buttonCallback_t callbackFunc);
-
-/**
- * Function for adding handler function for the UP button being released.
- * To remove the handler function, call this function with a NULL pointer.
- * @param callbackFunc  Function pointer to handler function.
- */
-void buttonSetUpReleaseCallback(buttonCallback_t callbackFunc);
-
-/**
- * Function for adding handler function for the DOWN button being pushed.
- * To remove the handler function, call this function with a NULL pointer.
- * @param callbackFunc  Function pointer to handler function.
- */
-void buttonSetDownPushCallback(buttonCallback_t callbackFunc);
-
-/**
- * Function for adding handler function for the DOWN button being released.
- * To remove the handler function, call this function with a NULL pointer.
- * @param callbackFunc  Function pointer to handler function.
- */
-void buttonSetDownReleaseCallback(buttonCallback_t callbackFunc);
-
-/**
- * Function for adding handler function for the LEFT button being pushed.
- * To remove the handler function, call this function with a NULL pointer.
- * @param callbackFunc  Function pointer to handler function.
- */
-void buttonSetLeftPushCallback(buttonCallback_t callbackFunc);
-
-/**
- * Function for adding handler function for the LEFT button being released.
- * To remove the handler function, call this function with a NULL pointer.
- * @param callbackFunc  Function pointer to handler function.
- */
-void buttonSetLeftReleaseCallback(buttonCallback_t callbackFunc);
-
-/**
- * Function for adding handler function for the RIGHT button being pushed.
- * To remove the handler function, call this function with a NULL pointer.
- * @param callbackFunc  Function pointer to handler function.
- */
-void buttonSetRightPushCallback(buttonCallback_t callbackFunc);
-
-/**
- * Function for adding handler function for the RIGHT button being released.
- * To remove the handler function, call this function with a NULL pointer.
- * @param callbackFunc  Function pointer to handler function.
- */
-void buttonSetRightReleaseCallback(buttonCallback_t callbackFunc);
+void buttonSetCallback(button_t button, event_t event, buttonCallback_t callbackFunc);
 
 #endif //BUTTON_INTERFACE_H
