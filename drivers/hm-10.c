@@ -63,8 +63,6 @@ void rcvByteCallback(uint8_t uartNumber) {
     rcvBuffer[rcvIndex++] = rcv;
 }
 
-
-
 uint8_t hm10Init(void) {
     uartSendString(DEBUG_UART, "Starting setup\n");
     currentState = pre_init;
@@ -169,9 +167,14 @@ uint8_t hm10Init(void) {
 }
 
 
-void sendCommand(uint8_t buttonVal) {
-    uartSendInteger(HM_10_UART, buttonVal, 10);
-
+bool send(uint8_t* frame, uint16_t frameLen) {
+    if (hm10Ready()) {
+        uartSendByteArray(HM_10_UART, frame, frameLen);
+        return true;
+    } else {
+        uartSendString(DEBUG_UART, "Tried to send frame but HM10 not ready!");
+        return false;
+    }
 }
 
 bool hm10Ready() {

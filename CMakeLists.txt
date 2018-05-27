@@ -19,5 +19,5 @@ SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
-set(SOURCE_FILES main.c drivers/uart.c drivers/uart.h drivers/hm-10.c drivers/hm-10.h drivers/buttonInterface.c drivers/buttonInterface.h Layers/dllLayer.c Layers/dllLayer.h Frames/dllFrame.c Frames/dllFrame.h Frames/appFrame.c Frames/appFrame.h external_libs/md5.c external_libs/md5.h external_libs/global.h Layers/appLayer.c Layers/appLayer.h)
+set(SOURCE_FILES main.c drivers/uart.c drivers/uart.h drivers/hm-10.c drivers/hm-10.h drivers/buttonInterface.c drivers/buttonInterface.h Layers/dllLayer.c Layers/dllLayer.h Frames/dllFrame.c Frames/dllFrame.h Frames/appFrame.c Frames/appFrame.h external_libs/md5.c external_libs/md5.h external_libs/global.h Layers/appLayer.c Layers/appLayer.h Library/command.h)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})

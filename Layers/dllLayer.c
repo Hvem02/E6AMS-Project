@@ -3,3 +3,6 @@
 //
 
 #include "dllLayer.h"
+#include "appLayer.h"
+#include "../Frames/dllFrame.h"
+

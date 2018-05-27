@@ -79,10 +79,12 @@ void testProgramAlex(void)
 {
     uartInit(0, 115200, 'O', 1, 8, 'N');
     sei();
-//    hm10Init();
+    hm10Init();
     buttonInterfaceInit();
 
-    uint8_t dllFrameSizeNoMD5 = 9;
+
+
+    /*uint8_t dllFrameSizeNoMD5 = 9;
     uint8_t hashLen = 16;
     uint8_t totalSize = dllFrameSizeNoMD5 + hashLen;
     uint8_t frame[totalSize];
@@ -103,11 +105,11 @@ void testProgramAlex(void)
     uint8_t hash[hashLen];
     MD5Final(hash, &md5_ctx);
 
-    memcpy(&frame[dllFrameSizeNoMD5], hash, hashLen);
+    memcpy(&frame[dllFrameSizeNoMD5], hash, hashLen);*/
 
 //    uartSendString(0, "Total string:\n");
 
-    uartSendByteArray(0, frame, totalSize);
+//    uartSendByteArray(0, frame, totalSize);
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"

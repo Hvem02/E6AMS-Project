@@ -7,15 +7,8 @@
 #define SEGMENT_MAX_SIZE 64
 
 #include <stdint.h>
+#include "../Library/command.h"
 
-typedef enum {
-    AckNack = 0,
-    Control = 1,
-    FWReset = 2,
-    FWReady = 3,
-    FWSegCount = 4,
-    FWSeg = 5
-} Command;
 
 typedef struct {
     Command cmd;

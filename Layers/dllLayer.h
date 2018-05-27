@@ -6,8 +6,8 @@
 #define E6AMS_DLLLAYER_H
 
 #include <stdint.h>
+#include "../Library/command.h"
 
 void createControlFrame(uint8_t profile, uint8_t button, uint8_t* frame);
-uint8_t getDllFrameSize(uint8_t);
 
 #endif //E6AMS_DLLLAYER_H

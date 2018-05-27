@@ -47,7 +47,13 @@ bool hm10Ready();
 uint8_t readCharWithDelay(uint8_t uartNum, uint8_t* retVal);
 
 
-void sendCommand(uint8_t buttonVal);
+/**
+ * Method for sending an frame via bluetooth.
+ *
+ * @param frame     The frame to be send.
+ * @param frameLen  The length of the frame to be send.
+ */
+bool send(uint8_t* frame, uint16_t frameLen);
 
 
 #endif // MH_10_H
