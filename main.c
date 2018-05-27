@@ -81,8 +81,7 @@ void mainProgram(void)
 
 void sendControl(button_t button, event_t event) {
     uartSendString(0, "Sending\n");
-    uint16_t appFrameSize = getControlPayloadSize();
-    uint16_t frameSize = getDllFrameSize(appFrameSize);
+    uint16_t frameSize = getDllSizeByCommand(Control);
     uint8_t frame[frameSize];
     createControlFrame(profile, button, frame);
     uartSendByteArray(0, frame, frameSize);

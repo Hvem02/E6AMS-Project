@@ -7,7 +7,7 @@
 
 #include <stdint.h>
 #include "../Library/command.h"
-
+uint16_t getDllSizeByCommand(Command command);
 uint16_t getDllFrameSize(uint16_t appFrameSize);
 void createControlFrame(uint8_t profile, uint8_t button, uint8_t* frame);
 

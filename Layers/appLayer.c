@@ -13,3 +13,7 @@ uint16_t appFrameSize(Command command) {
             return 0;
     }
 }
+
+void createControlAppFrame(uint8_t profile, uint8_t button, uint8_t* frame) {
+    createControlPayload(frame, profile, button);
+}
