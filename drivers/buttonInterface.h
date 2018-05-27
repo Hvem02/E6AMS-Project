@@ -15,7 +15,7 @@ typedef enum
     RIGHT = 1,
     DOWN  = 2,
     LEFT  = 3,
-} buttom_t;
+} button_t;
 
 /**
  * Enum for event type number.
@@ -33,7 +33,7 @@ typedef enum
  * @param button        Enum for which button to use.
  * @param event         Enum for push or release event.
  */
-typedef void (* buttonCallback_t)(buttom_t buttom, event_t event);
+typedef void (* buttonCallback_t)(button_t button, event_t event);
 
 //***************************************************************
 // Public Function Definitions                                  *
@@ -44,13 +44,13 @@ typedef void (* buttonCallback_t)(buttom_t buttom, event_t event);
 void buttonInit(void);
 
 /**
- * Function used to register callback function for when buttom is pressed or released.
+ * Function used to register callback function for when button is pressed or released.
  * To unregister the callback function, register NULL instead.
  *
  * @param button        Enum for which button to use.
  * @param event         Enum for push or release event.
- * @param callbackFunc  Callback function to be called when buttom is pressed or released.
+ * @param callbackFunc  Callback function to be called when button is pressed or released.
  */
-void buttonSetCallback(buttom_t button, event_t event, buttonCallback_t callbackFunc);
+void buttonSetCallback(button_t button, event_t event, buttonCallback_t callbackFunc);
 
 #endif //BUTTON_INTERFACE_H

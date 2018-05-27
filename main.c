@@ -41,6 +41,12 @@
 
 ISR(__vector_default){};
 
+uint8_t profile = 1;
+const uint8_t profileMin = 1;
+const uint8_t profileMax = 5;
+bool profileRising = true;
+
+
 void mainProgram(void);
 void testProgramAlex(void);
 void testProgramSoren(void);
@@ -61,8 +67,8 @@ void mainProgram(void)
     uartInit(0, 115200, 'O', 1, 8, 'N');
     sei();
     hm10Init();
-    buttonInterfaceInit();
-    buttonSetLeftPushCallback(buttonLeftCallback);
+//    buttonInterfaceInit();
+//    buttonSetLeftPushCallback(buttonLeftCallback);
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
@@ -73,15 +79,43 @@ void mainProgram(void)
 }
 
 
+void sendControl(button_t button, event_t event) {
+    uartSendString(0, "Sending\n");
+    uint16_t appFrameSize = getControlPayloadSize();
+    uint16_t frameSize = getDllFrameSize(appFrameSize);
+    uint8_t frame[frameSize];
+    createControlFrame(profile, button, frame);
+    uartSendByteArray(0, frame, frameSize);
+    send(frame, frameSize);
+}
 
+void switchProfile(button_t button, event_t event) {
+    if (profileRising) {
+        if (profile == profileMax) {
+            profileRising = false;
+            switchProfile(button, event);
+            return;
+        }
+        ++profile;
+    } else {
+        if (profile == profileMin) {
+            profileRising = true;
+            switchProfile(button, event);
+            return;
+        }
+        --profile;
+    }
+}
 
 void testProgramAlex(void)
 {
     uartInit(0, 115200, 'O', 1, 8, 'N');
     sei();
     hm10Init();
-    buttonInterfaceInit();
-
+    buttonInit();
+    buttonSetCallback(LEFT, PUSH, sendControl);
+    buttonSetCallback(RIGHT, PUSH, sendControl);
+    buttonSetCallback(UP, PUSH, switchProfile);
 
 
     /*uint8_t dllFrameSizeNoMD5 = 9;

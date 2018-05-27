@@ -49,7 +49,7 @@ void buttonInit(void)
     sei();
 }
 
-void buttonSetCallback(buttom_t button, event_t event, buttonCallback_t callbackFunc)
+void buttonSetCallback(button_t button, event_t event, buttonCallback_t callbackFunc)
 {
     uint8_t interruptNum = buttonToInterrupt[(uint8_t)button];
     uint8_t eventNum = (uint8_t)event;
@@ -67,7 +67,7 @@ void buttonInterruptHandler(uint8_t interruptNum)
         // Pressed
         if(interruptCallback[interruptNum][(uint8_t)PUSH] != NULL && buttonIsPressed[buttonNum] == false)
         {
-            interruptCallback[interruptNum][(uint8_t)PUSH]((buttom_t)buttonNum, PUSH);
+            interruptCallback[interruptNum][(uint8_t)PUSH]((button_t)buttonNum, PUSH);
         }
         buttonIsPressed[buttonNum] = true;
     }
@@ -76,7 +76,7 @@ void buttonInterruptHandler(uint8_t interruptNum)
         // Released
         if(interruptCallback[interruptNum][(uint8_t)RELEASE] != NULL && buttonIsPressed[buttonNum] == true)
         {
-            interruptCallback[interruptNum][(uint8_t)RELEASE]((buttom_t)buttonNum, RELEASE);
+            interruptCallback[interruptNum][(uint8_t)RELEASE]((button_t)buttonNum, RELEASE);
         }
         buttonIsPressed[buttonNum] = false;
     }

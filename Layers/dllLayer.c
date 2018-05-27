@@ -6,3 +6,6 @@
 #include "appLayer.h"
 #include "../Frames/dllFrame.h"
 
+uint16_t getDllFrameSize(uint16_t appFrameSize) {
+    return getSizeOfDllFrame(appFrameSize);
+}

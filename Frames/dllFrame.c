@@ -16,13 +16,6 @@ uint16_t getTotalSizeOfDllFrame(uint16_t appFrameSize) {
     return (preambleSize + lengthSize + versionSize + appFrameSize + hashSize);
 }
 
-/**
- * This function will return the size of the dllframe counted from the version byte of the frame.
- * This is in order for getting that field and not for the total size of the dll frame.
- *
- * @param appFrameSize  The size of the AppFrame
- * @return              The size field of the DLL frame
- */
 uint16_t getSizeOfDllFrame(uint16_t appFrameSize) {
     return (versionSize + appFrameSize + hashSize);
 }
