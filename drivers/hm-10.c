@@ -168,6 +168,12 @@ uint8_t hm10Init(void) {
     return 0;
 }
 
+
+void sendCommand(uint8_t buttonVal) {
+    uartSendInteger(HM_10_UART, buttonVal, 10);
+
+}
+
 bool hm10Ready() {
     return (currentState == command)? true:false;
 }
