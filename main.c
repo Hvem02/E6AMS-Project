@@ -146,6 +146,7 @@ void switchProfile(button_t button, event_t event) {
     setLEDs();
 }
 
+
 void testProgramAlex(void)
 {
     uartInit(0, 115200, 'O', 1, 8, 'N');
@@ -157,6 +158,7 @@ void testProgramAlex(void)
     buttonSetCallback(UP, PUSH, switchProfile);
     initLEDs();
     setLEDs();
+    initDll();
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
