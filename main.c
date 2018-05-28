@@ -66,7 +66,7 @@ void mainProgram(void)
 {
     uartInit(0, 115200, 'O', 1, 8, 'N');
     sei();
-    hm10Init();
+    hm10Init(receiveDll);
 //    buttonInterfaceInit();
 //    buttonSetLeftPushCallback(buttonLeftCallback);
 
@@ -110,39 +110,11 @@ void testProgramAlex(void)
 {
     uartInit(0, 115200, 'O', 1, 8, 'N');
     sei();
-    hm10Init();
+    hm10Init(receiveDll);
     buttonInit();
     buttonSetCallback(LEFT, PUSH, sendControl);
     buttonSetCallback(RIGHT, PUSH, sendControl);
     buttonSetCallback(UP, PUSH, switchProfile);
-
-
-    /*uint8_t dllFrameSizeNoMD5 = 9;
-    uint8_t hashLen = 16;
-    uint8_t totalSize = dllFrameSizeNoMD5 + hashLen;
-    uint8_t frame[totalSize];
-    frame[0] = 0xAA;
-    frame[1] = 0x00;
-    frame[2] = 0x16;
-    frame[3] = 0x01;
-    frame[4] = 0x01;
-    frame[5] = 0x00;
-    frame[6] = 0x02;
-    frame[7] = 0x01;
-    frame[8] = 0x01;
-
-    MD5_CTX md5_ctx;
-    MD5Init(&md5_ctx);
-    MD5Update(&md5_ctx, frame, dllFrameSizeNoMD5);
-
-    uint8_t hash[hashLen];
-    MD5Final(hash, &md5_ctx);
-
-    memcpy(&frame[dllFrameSizeNoMD5], hash, hashLen);*/
-
-//    uartSendString(0, "Total string:\n");
-
-//    uartSendByteArray(0, frame, totalSize);
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"

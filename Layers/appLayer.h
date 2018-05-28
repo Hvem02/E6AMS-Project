@@ -11,4 +11,5 @@
 uint16_t appFrameSize(Command command);
 void createControlAppFrame(uint8_t profile, uint8_t button, uint8_t* frame);
 
+
 #endif //E6AMS_APPLAYER_H

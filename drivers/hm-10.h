@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "uart.h"
 
 //***************************************************************
 // Public Defines                                               *
@@ -13,10 +14,14 @@
 //***************************************************************
 // Public Function Definitions                                  *
 //***************************************************************
+
 /**
+ * Setting up the HM-10 Driver, with a receive callback for when it is setup
  *
+ * @param callback  A callback being called on connect/disconnect and when the host send data
+ * @return          0 on success, else see UART.h for errors than can be thrown.
  */
-uint8_t hm10Init(void);
+uint8_t hm10Init(uartCallback_t callback);
 
 
 
