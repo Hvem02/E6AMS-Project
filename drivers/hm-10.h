@@ -5,6 +5,13 @@
 #include <stdbool.h>
 #include "uart.h"
 
+/**
+ * Following is expected setup before using this driver:
+ *  AT+BAUD4
+ *  AT+PARI1
+ *  AT+NOTI1
+ */
+
 //***************************************************************
 // Public Defines                                               *
 //***************************************************************

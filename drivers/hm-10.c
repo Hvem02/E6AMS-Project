@@ -4,7 +4,7 @@
 
 #define DEBUG_UART          0
 #define HM_10_UART          3
-#define HM_10_BAUDRATE      9600
+#define HM_10_BAUDRATE      115200
 #define HM_10_PARITY_BITS   1
 #define HM_10_DATABITS      8
 #define HM_10_START_BITS    1
@@ -14,10 +14,7 @@
 #define BUFFER_SIZE 257
 #define SET_LEN 7
 
-const char* timeoutError = "I did not receive a char within the 10 ms timeout\r\n";
 const char* atTest = "AT";
-const char* responseOK = "OK";
-const char* responseFAILED = "FAILED";
 
 static char receiveBuffer[BUFFER_SIZE] = {0};
 
@@ -41,20 +38,10 @@ static uint8_t readIndex = 0;
 enum states {
     pre_init,
     init,
-    command,
-    fw_upload
-};
-
-enum settings {
-//    baud,
-//    name,
-    par,
-    noti,
-    done
+    command
 };
 
 enum states currentState;
-enum settings currentSettingState;
 
 void rcvByteCallback(uint8_t uartNumber) {
     uint8_t rcv;
@@ -65,10 +52,9 @@ void rcvByteCallback(uint8_t uartNumber) {
 uint8_t hm10Init(uartCallback_t callback) {
     uartSendString(DEBUG_UART, "Starting setup\n");
     currentState = pre_init;
-    currentSettingState = noti;
 
     // Init communications
-    uint8_t success = uartInit(HM_10_UART, HM_10_BAUDRATE, 'D', HM_10_PARITY_BITS, HM_10_DATABITS, 'N');
+    uint8_t success = uartInit(HM_10_UART, HM_10_BAUDRATE, 'O', HM_10_PARITY_BITS, HM_10_DATABITS, 'N');
 
     if (success != UART_SUCCES) {
         uartSendString(DEBUG_UART, "Failed to setup uart for HM-10");
@@ -95,31 +81,11 @@ uint8_t hm10Init(uartCallback_t callback) {
             // Not null, hence what we asked for is in the buffer
             switch (currentState) {
                 case pre_init:
-                    uartSendString(DEBUG_UART, "In pre\n");
                     readIndex = (uint8_t) ((receiveBuffer-index) + 2);
-                    currentState = init;
+                    currentState = command;
                     break;
                 case init:
-                    switch (currentSettingState) {
-                        case par:
-                            uartSendString(DEBUG_UART, "par\n");
-                            readIndex = (uint8_t) ((receiveBuffer-index) + SET_LEN);
-                            currentSettingState = noti;
-                            break;
-                        case noti:
-                            uartSendString(DEBUG_UART, "noti\n");
-                            readIndex = (uint8_t) ((receiveBuffer-index) + SET_LEN);
-                            currentSettingState = done;
-                            break;
-                        case done:
-                            uartSendString(DEBUG_UART, "done\n");
-                            readIndex = (uint8_t) ((receiveBuffer-index) + SET_LEN);
-                            currentState = command;
-                            break;
-                        default:
-                            uartSendString(DEBUG_UART, "Default\n");
-                            break;
-                    }
+                    currentState = command;
                     break;
                 default:
                     uartSendString(DEBUG_UART, "Default2\n");
@@ -132,25 +98,8 @@ uint8_t hm10Init(uartCallback_t callback) {
             case pre_init:
                 uartSendString(HM_10_UART, atTest);
                 break;
-            case init:
-                switch (currentSettingState) {
-                    case par:
-//                        uartSendString(DEBUG_UART, "Sending par\n");
-                        uartSendString(HM_10_UART, "AT+PARI1");
-                        break;
-                    case noti:
-//                        uartSendString(DEBUG_UART, "Sending NOTI\n");
-                        uartSendString(HM_10_UART, "AT+NOTI1");
-                        break;
-                    case done:
-//                        uartSendString(DEBUG_UART, "Done\n");
-                        currentState = command;
-                        break;
-                    default:
-                        break;
-                }
-                break;
             default:
+                uartSendString(DEBUG_UART, "Default\n");
                 break;
         }
         _delay_ms(16);
