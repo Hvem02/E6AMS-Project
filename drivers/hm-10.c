@@ -19,10 +19,10 @@ const char* atTest = "AT";
 const char* responseOK = "OK";
 const char* responseFAILED = "FAILED";
 
-char rcvBuffer[BUFFER_SIZE] = {0};
+static char receiveBuffer[BUFFER_SIZE] = {0};
 
-uint8_t writeIndex = 0;
-uint8_t readIndex = 0;
+static uint8_t writeIndex = 0;
+static uint8_t readIndex = 0;
 
 //***************************************************************
 // Macro Functions                                              *
@@ -59,7 +59,7 @@ enum settings currentSettingState;
 void rcvByteCallback(uint8_t uartNumber) {
     uint8_t rcv;
     uartReceiveByte(uartNumber, &rcv);
-    rcvBuffer[writeIndex++] = rcv;
+    receiveBuffer[writeIndex++] = rcv;
 }
 
 uint8_t hm10Init(uartCallback_t callback) {
@@ -89,31 +89,31 @@ uint8_t hm10Init(uartCallback_t callback) {
 
         // Handle read of data
 
-        char* index = strstr(&rcvBuffer[readIndex], "OK");
+        char* index = strstr(&receiveBuffer[readIndex], "OK");
 
         if (index != NULL) {
             // Not null, hence what we asked for is in the buffer
             switch (currentState) {
                 case pre_init:
                     uartSendString(DEBUG_UART, "In pre\n");
-                    readIndex = (uint8_t) ((rcvBuffer-index) + 2);
+                    readIndex = (uint8_t) ((receiveBuffer-index) + 2);
                     currentState = init;
                     break;
                 case init:
                     switch (currentSettingState) {
                         case par:
                             uartSendString(DEBUG_UART, "par\n");
-                            readIndex = (uint8_t) ((rcvBuffer-index) + SET_LEN);
+                            readIndex = (uint8_t) ((receiveBuffer-index) + SET_LEN);
                             currentSettingState = noti;
                             break;
                         case noti:
                             uartSendString(DEBUG_UART, "noti\n");
-                            readIndex = (uint8_t) ((rcvBuffer-index) + SET_LEN);
+                            readIndex = (uint8_t) ((receiveBuffer-index) + SET_LEN);
                             currentSettingState = done;
                             break;
                         case done:
                             uartSendString(DEBUG_UART, "done\n");
-                            readIndex = (uint8_t) ((rcvBuffer-index) + SET_LEN);
+                            readIndex = (uint8_t) ((receiveBuffer-index) + SET_LEN);
                             currentState = command;
                             break;
                         default:

@@ -88,6 +88,45 @@ void sendControl(button_t button, event_t event) {
     send(frame, frameSize);
 }
 
+void initLEDs() {
+    DDRB |= 0b10;   // PB1
+    DDRL |= 0b10000010;   // PL7+PL1
+}
+
+void setLEDs() {
+    // ones = PORTB1
+    // twos = PORTL1
+    // fours = PORTL5
+    switch (profile) {
+        case 1:
+            PORTL &= 0b11011101;
+            PORTB |= 0b10;
+            break;
+        case 2:
+            PORTB &= 0b11111101;
+            PORTL &= 0b01111111;
+            PORTL |= 0b10;
+            break;
+        case 3:
+            PORTL &= 0b01111111;
+            PORTB |= 0b10;
+            PORTL |= 0b10;
+            break;
+        case 4:
+            PORTB &= 0b11111101;
+            PORTL &= 0b11111101;
+            PORTL |= 0b10000000;
+            break;
+        case 5:
+            PORTL &= 0b11011111;
+            PORTB |= 0b10;
+            PORTL |= 0b10000000;
+            break;
+        default:
+            break;
+    }
+}
+
 void switchProfile(button_t button, event_t event) {
     if (profileRising) {
         if (profile == profileMax) {
@@ -104,6 +143,7 @@ void switchProfile(button_t button, event_t event) {
         }
         --profile;
     }
+    setLEDs();
 }
 
 void testProgramAlex(void)
@@ -115,6 +155,8 @@ void testProgramAlex(void)
     buttonSetCallback(LEFT, PUSH, sendControl);
     buttonSetCallback(RIGHT, PUSH, sendControl);
     buttonSetCallback(UP, PUSH, switchProfile);
+    initLEDs();
+    setLEDs();
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"

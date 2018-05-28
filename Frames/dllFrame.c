@@ -50,7 +50,7 @@ void createHash(uint8_t* dllFrameNoMD5, uint16_t dllFrameSizeNoMD5) {
 void createDllFrame(uint8_t* appFrame, uint8_t* dllFrame, uint16_t appFrameSize) {
     dllFrame[0] = PREAMBLE;    // preamble
     uint16_t frameSize = getSizeOfDllFrame(appFrameSize); // version appFrameSize and md5 hash
-    dllFrame[1] = ((uint8_t)((frameSize&0xFF00)>>8));
+    dllFrame[1] = ((uint8_t)((frameSize & 0xFF00) >> 8));
     dllFrame[2] = (uint8_t)(frameSize & 0xFF);
     dllFrame[3] = VERSION;
     memcpy(&dllFrame[4], appFrame, appFrameSize);

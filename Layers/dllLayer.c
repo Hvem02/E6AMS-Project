@@ -9,10 +9,10 @@
 
 #define BUFFER_SIZE 257
 
-uint8_t writeIndex = 0;
-uint8_t readIndex = 0;
-uint8_t preambleIndex = 0;
-uint16_t fwFrameLength = 0;
+static uint8_t writeIndex = 0;
+static uint8_t readIndex = 0;
+static uint8_t preambleIndex = 0;
+static uint16_t fwFrameLength = 0;
 
 enum firmwareStates {
     missing_preamble,
@@ -21,7 +21,7 @@ enum firmwareStates {
 
 enum firmwareStates firmwareState = missing_preamble;
 
-uint8_t rcvBuffer[BUFFER_SIZE] = {0};
+uint8_t receiveBuffer[BUFFER_SIZE] = {0};
 
 uint16_t getDllFrameSize(uint16_t appFrameSize) {
     return getTotalSizeOfDllFrame(appFrameSize);
@@ -42,7 +42,7 @@ void createControlFrame(uint8_t profile, uint8_t button, uint8_t* frame) {
 void receiveDll(uint8_t uartNumber) {
     uint8_t rcv;
     uartReceiveByte(uartNumber, &rcv);
-    rcvBuffer[writeIndex++] = rcv;
+    receiveBuffer[writeIndex++] = rcv;
 }
 
 void checkForFW() {
@@ -69,7 +69,7 @@ void checkForFW() {
         for (uint8_t i = 0; i < bytesReady; ++i) {
             preambleIndex = readIndex + i;
 
-            if (rcvBuffer[preambleIndex] == PREAMBLE) {
+            if (receiveBuffer[preambleIndex] == PREAMBLE) {
                 preambleFound = true;
                 break;
             }
@@ -83,7 +83,7 @@ void checkForFW() {
             return;
         }
 
-        fwFrameLength = (uint16_t) ((rcvBuffer[preambleIndex+1] << 8) + rcvBuffer[preambleIndex+2]);
+        fwFrameLength = (uint16_t) ((receiveBuffer[preambleIndex+1] << 8) + receiveBuffer[preambleIndex+2]);
 
 
 
