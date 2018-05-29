@@ -22,15 +22,20 @@ typedef struct {
  *
  * @return The size needed for an array to keep the control payload.
  */
-uint16_t getControlPayloadSize();
+uint16_t getPayloadSizeBasedOfCommand(Command command);
 
 /**
  * Method for creating an correct control payload for the AppFrame.
  *
- * @param payload   The resulting payload.
+ * @param frame   The resulting payload.
  * @param profile   The profile being used.
  * @param button    The button number pressed.
  */
-void createControlPayload(uint8_t* payload, uint8_t profile, uint8_t button);
+void createControlFrame(uint8_t *frame, uint8_t profile, uint8_t button);
+
+
+void createAppFrame(uint8_t* appFrame, Command command, uint8_t* payload);
+
+void createAppFrameFromBytes(AppFrame* appFrame, uint8_t* appFrameBytes);
 
 #endif //E6AMS_APPFRAME_H

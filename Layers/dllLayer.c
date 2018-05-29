@@ -4,19 +4,30 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <string.h>
 #include "dllLayer.h"
 #include "appLayer.h"
 #include "../Frames/dllFrame.h"
 #include "../drivers/uart.h"
+#include "../drivers/hm-10.h"
+#include "../drivers/buttonInterface.h"
 
 #define BUFFER_SIZE 257
 
 static uint8_t writeIndex = 0;
 static uint8_t readIndex = 0;
 static uint8_t preambleIndex = 0;
-static uint16_t fwFrameLength = 0;
-static bool frameReady = false;
+
+
 //static const uint8_t DLLMAXFRAMESIZE = 1 + 2 + 1 + 1 + 2 + 64 + 16;
+
+enum firmwareStates {
+    missing_preamble,
+    more_data,
+    done
+};
+
+enum firmwareStates firmwareState = missing_preamble;
 
 // Based of the max size of a frame:
 //  which is 64 bytes of payload, 16 bytes crc, 2*2 bytes of lengths, 1 byte preamble, version and cmd = 87
@@ -25,20 +36,12 @@ static bool frameReady = false;
 
 ISR(TIMER0_OVF_vect) {
     // Do stuff
-    frameReady = true;
+    firmwareState = more_data;
     // Disable interrupts
     TIMSK0 &= 0b11111000;
 }
 
-enum firmwareStates {
-    missing_preamble,
-    more_data
-};
-
-enum firmwareStates firmwareState = missing_preamble;
-
 uint8_t receiveBuffer[BUFFER_SIZE] = {0};
-
 
 void initDll() {
     // Setup timer0
@@ -61,64 +64,93 @@ uint16_t getDllSizeByCommand(Command command) {
     return getDllFrameSize(appSize);
 }
 
-void createControlFrame(uint8_t profile, uint8_t button, uint8_t* frame) {
-    uint16_t appSize = appFrameSize(Control);
-    uint8_t appFrame[appSize];
-    createControlAppFrame(profile, button, appFrame);
-    createDllFrame(appFrame, frame, appSize);
-}
 
 void receiveDll(uint8_t uartNumber) {
     uint8_t rcv;
     uartReceiveByte(uartNumber, &rcv);
     receiveBuffer[writeIndex++] = rcv;
+
     if (rcv == PREAMBLE) {
         TIMSK0 |= 0b1;
+        preambleIndex = (uint8_t )(writeIndex-1);
     }
 }
 
-void checkForFW() {
-    if (writeIndex == readIndex) {
+
+bool checkForFW() {
+
+    if (firmwareState == missing_preamble) {
         // No new data
-        return;
+        return false;
     }
+
     uint8_t bytesReady;
+    bool wrappingAround = false;
 
     if (writeIndex > readIndex) {
         bytesReady = writeIndex - readIndex;
     } else {
-        bytesReady = (uint8_t ) (BUFFER_SIZE - 2 - readIndex + writeIndex);
+        // -2, because of an additional index for ensuring \0 in BUFFER_SIZE and an additional minus for making an index
+        bytesReady = (uint8_t ) (BUFFER_SIZE - 1 - readIndex + writeIndex);
+        wrappingAround = true;
     }
 
-    if (firmwareState == missing_preamble) {
-        // Make sure we have the Preamble and two length bytes before handling data
-        if (bytesReady < 3) {
-            return;
-        }
-
-        bool preambleFound = false;
-
-        for (uint8_t i = 0; i < bytesReady; ++i) {
-            preambleIndex = readIndex + i;
-
-            if (receiveBuffer[preambleIndex] == PREAMBLE) {
-                preambleFound = true;
-                break;
-            }
-        }
-
-        if (!preambleFound) {
-            return;
-        }
-
-        if ((bytesReady-preambleIndex) < 2) {
-            return;
-        }
-
-        fwFrameLength = (uint16_t) ((receiveBuffer[preambleIndex+1] << 8) + receiveBuffer[preambleIndex+2]);
-
-
-
-        firmwareState = more_data;
+    // Make sure we have the Preamble and two length bytes before handling data
+    if (bytesReady < 3) {
+        return false;
     }
+
+    uint16_t fwFrameLength = (uint16_t) ((receiveBuffer[preambleIndex+1] << 8u) + receiveBuffer[preambleIndex+2] + 3u);
+    uint16_t fwFrameLengthOrg = fwFrameLength;
+
+    if (fwFrameLength > bytesReady) {
+        return false;
+    }
+
+    uint8_t fwFrame[fwFrameLength];
+    uint8_t fwFrameIndex = 0;
+
+    if (wrappingAround) {
+        fwFrameIndex = (uint8_t )(BUFFER_SIZE - preambleIndex - 1);
+        memcpy(fwFrame, &receiveBuffer[preambleIndex], fwFrameIndex);
+        fwFrameLength -= fwFrameIndex;
+        preambleIndex = 0;
+    }
+
+    memcpy(&fwFrame[fwFrameIndex], &receiveBuffer[preambleIndex], fwFrameLength);
+
+    if (dllFrameValid(fwFrame) == false) {
+        sendNack();
+        return false;
+    }
+
+    uint16_t appFrameSize = fwFrameLengthOrg - getDllSizeWithoutApp();
+
+    uint8_t appFrame[appFrameSize];
+    uint16_t appFrameStartIndex = getAppStartIndex();
+
+    memcpy(appFrame, &fwFrame[appFrameStartIndex], appFrameSize);
+
+    appReceive(appFrame);
+
+    return true;
+}
+
+void sendNack() {
+    uint16_t totalDllFrameSize = getDllSizeByCommand(AckNack);
+    uint16_t totalAppFrameSize = appFrameSize(AckNack);
+    uint8_t dllFrame[totalAppFrameSize];
+    uint8_t appFrame[totalAppFrameSize];
+    createNackAppFrameBytes(appFrame);
+    createDllFrame(appFrame, dllFrame, totalAppFrameSize);
+
+    send(dllFrame, totalDllFrameSize);
+}
+
+
+void dllSend(uint8_t* appFrame, uint16_t appFrameLength) {
+    uint16_t dllSize = getTotalSizeOfDllFrame(appFrameLength);
+    uint8_t dllFrame[dllSize];
+    createDllFrame(appFrame, dllFrame, appFrameLength);
+    send(dllFrame, dllSize);
 }

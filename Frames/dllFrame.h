@@ -6,6 +6,7 @@
 #define E6AMS_DLLFRAME_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "appFrame.h"
 
 static const uint8_t VERSION   = 0x01;
@@ -27,6 +28,10 @@ typedef struct {
  */
 uint16_t getTotalSizeOfDllFrame(uint16_t appFrameSize);
 
+uint16_t getDllSizeWithoutApp();
+
+uint16_t getAppStartIndex();
+
 /**
  * Function for creation of a dllFrame.
  *
@@ -36,6 +41,8 @@ uint16_t getTotalSizeOfDllFrame(uint16_t appFrameSize);
  */
 void createDllFrame(uint8_t* appFrame, uint8_t* dllFrame, uint16_t appFrameSize);
 
+void dllFrameFromBytes(DllFrame* res, uint8_t* frame, uint8_t* appPayload);
 
+bool dllFrameValid(uint8_t* frame);
 
 #endif //E6AMS_DLLFRAME_H

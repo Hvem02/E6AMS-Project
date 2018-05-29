@@ -8,12 +8,16 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "../Library/command.h"
+#include "../Frames/dllFrame.h"
 
 uint16_t getDllSizeByCommand(Command command);
 uint16_t getDllFrameSize(uint16_t appFrameSize);
 
-void createControlFrame(uint8_t profile, uint8_t button, uint8_t* frame);
 void receiveDll(uint8_t uartNumber);
 void initDll();
+void sendNack();
+void dllSend(uint8_t* appFrame, uint16_t appFrameLength);
+
+bool checkForFW();
 
 #endif //E6AMS_DLLLAYER_H

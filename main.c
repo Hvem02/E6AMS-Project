@@ -41,12 +41,6 @@
 
 ISR(__vector_default){};
 
-uint8_t profile = 1;
-const uint8_t profileMin = 1;
-const uint8_t profileMax = 5;
-bool profileRising = true;
-
-
 void mainProgram(void);
 void testProgramAlex(void);
 void testProgramSoren(void);
@@ -78,74 +72,10 @@ void mainProgram(void)
 #pragma clang diagnostic pop
 }
 
-
-void sendControl(button_t button, event_t event) {
-    uartSendString(0, "Sending\n");
-    uint16_t frameSize = getDllSizeByCommand(Control);
-    uint8_t frame[frameSize];
-    createControlFrame(profile, button, frame);
-    uartSendByteArray(0, frame, frameSize);
-    send(frame, frameSize);
-}
-
 void initLEDs() {
     DDRB |= 0b10;   // PB1
     DDRL |= 0b10000010;   // PL7+PL1
 }
-
-void setLEDs() {
-    // ones = PORTB1
-    // twos = PORTL1
-    // fours = PORTL5
-    switch (profile) {
-        case 1:
-            PORTL &= 0b11011101;
-            PORTB |= 0b10;
-            break;
-        case 2:
-            PORTB &= 0b11111101;
-            PORTL &= 0b01111111;
-            PORTL |= 0b10;
-            break;
-        case 3:
-            PORTL &= 0b01111111;
-            PORTB |= 0b10;
-            PORTL |= 0b10;
-            break;
-        case 4:
-            PORTB &= 0b11111101;
-            PORTL &= 0b11111101;
-            PORTL |= 0b10000000;
-            break;
-        case 5:
-            PORTL &= 0b11011111;
-            PORTB |= 0b10;
-            PORTL |= 0b10000000;
-            break;
-        default:
-            break;
-    }
-}
-
-void switchProfile(button_t button, event_t event) {
-    if (profileRising) {
-        if (profile == profileMax) {
-            profileRising = false;
-            switchProfile(button, event);
-            return;
-        }
-        ++profile;
-    } else {
-        if (profile == profileMin) {
-            profileRising = true;
-            switchProfile(button, event);
-            return;
-        }
-        --profile;
-    }
-    setLEDs();
-}
-
 
 void testProgramAlex(void)
 {
@@ -164,7 +94,8 @@ void testProgramAlex(void)
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
     while(1)
     {
-        _delay_ms(1000);
+        _delay_ms(12);
+        checkForFW();
     }
 #pragma clang diagnostic pop
 }
