@@ -15,7 +15,6 @@ uint16_t getDllFrameSize(uint16_t appFrameSize);
 
 void receiveDll(uint8_t uartNumber);
 void initDll();
-void sendNack();
 void dllSend(uint8_t* appFrame, uint16_t appFrameLength);
 
 bool checkForFW();

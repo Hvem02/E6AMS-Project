@@ -12,7 +12,7 @@
 uint16_t appFrameSize(Command command);
 
 void createNackAppFrame(AppFrame* appFrame);
-void createNackAppFrameBytes(uint8_t* appFrame);
+void createAckNackAppFrameBytes(uint8_t *appFrame, bool ack);
 void sendControl(button_t button, event_t event);
 void switchProfile(button_t button, event_t event);
 void setLEDs();

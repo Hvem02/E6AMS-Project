@@ -19,8 +19,8 @@ uint16_t appFrameSize(Command command) {
     return getPayloadSizeBasedOfCommand(command);
 }
 
-void createNackAppFrameBytes(uint8_t* appFrame) {
-    createAppFrame(appFrame, AckNack, 0);
+void createAckNackAppFrameBytes(uint8_t *appFrame, bool ack) {
+    createAppFrame(appFrame, AckNack, (uint8_t *)&ack);
 }
 
 

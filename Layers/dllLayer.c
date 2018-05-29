@@ -76,6 +76,17 @@ void receiveDll(uint8_t uartNumber) {
     }
 }
 
+void sendAckNack(bool ack) {
+    uint16_t totalDllFrameSize = getDllSizeByCommand(AckNack);
+    uint16_t totalAppFrameSize = appFrameSize(AckNack);
+    uint8_t dllFrame[totalAppFrameSize];
+    uint8_t appFrame[totalAppFrameSize];
+    createAckNackAppFrameBytes(appFrame, ack);
+    createDllFrame(appFrame, dllFrame, totalAppFrameSize);
+
+    send(dllFrame, totalDllFrameSize);
+}
+
 
 bool checkForFW() {
 
@@ -120,7 +131,7 @@ bool checkForFW() {
     memcpy(&fwFrame[fwFrameIndex], &receiveBuffer[preambleIndex], fwFrameLength);
 
     if (dllFrameValid(fwFrame) == false) {
-        sendNack();
+        sendAckNack(false);
         return false;
     }
 
@@ -132,21 +143,10 @@ bool checkForFW() {
     memcpy(appFrame, &fwFrame[appFrameStartIndex], appFrameSize);
 
     appReceive(appFrame);
+    sendAckNack(true);
 
     return true;
 }
-
-void sendNack() {
-    uint16_t totalDllFrameSize = getDllSizeByCommand(AckNack);
-    uint16_t totalAppFrameSize = appFrameSize(AckNack);
-    uint8_t dllFrame[totalAppFrameSize];
-    uint8_t appFrame[totalAppFrameSize];
-    createNackAppFrameBytes(appFrame);
-    createDllFrame(appFrame, dllFrame, totalAppFrameSize);
-
-    send(dllFrame, totalDllFrameSize);
-}
-
 
 void dllSend(uint8_t* appFrame, uint16_t appFrameLength) {
     uint16_t dllSize = getTotalSizeOfDllFrame(appFrameLength);
