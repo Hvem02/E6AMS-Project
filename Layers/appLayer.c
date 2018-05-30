@@ -15,7 +15,7 @@
 
 static uint8_t profile = 1;
 static const uint8_t profileMin = 1;
-static const uint8_t profileMax = 5;
+static uint8_t profileMax = 5;
 static bool profileRising = true;
 static uint16_t segmentsToReceive = 0;
 
@@ -127,6 +127,10 @@ void appReceive(uint8_t* appFrame) {
             // Count down segmentsToReceive
             --segmentsToReceive;
             // Save the segment
+            sendAckNackAppFrameBytes(true);
+            break;
+        case MaxProfiles:
+            profileMax = appFrameObj.payload[0];
             sendAckNackAppFrameBytes(true);
             break;
         default:

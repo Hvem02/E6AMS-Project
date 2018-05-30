@@ -12,7 +12,8 @@ typedef enum {
     FWReset = 2,
     FWReady = 3,
     FWSegCount = 4,
-    FWSeg = 5
+    FWSeg = 5,
+    MaxProfiles = 6,
 } Command;
 
 #endif //E6AMS_COMMAND_H
