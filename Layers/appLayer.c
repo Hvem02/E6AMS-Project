@@ -19,6 +19,8 @@ static uint8_t profileMax = 5;
 static bool profileRising = true;
 static uint16_t segmentsToReceive = 0;
 
+static FwSegmentReceiveCallback_t FwSegmentReceiveCallback = NULL;
+
 uint16_t appFrameSize(Command command) {
     return getPayloadSizeBasedOfCommand(command);
 }
@@ -124,6 +126,10 @@ void appReceive(uint8_t* appFrame) {
             sendAckNackAppFrameBytes(true);
             break;
         case FWSeg:
+            if(FwSegmentReceiveCallback != NULL)
+            {
+                FwSegmentReceiveCallback(&appFrameObj);
+            }
             // Count down segmentsToReceive
             --segmentsToReceive;
             // Save the segment
@@ -136,4 +142,9 @@ void appReceive(uint8_t* appFrame) {
         default:
             break;
     }
+}
+
+void registerFwSegmentReceiveCallback(FwSegmentReceiveCallback_t recieveCallback)
+{
+    FwSegmentReceiveCallback = recieveCallback;
 }
