@@ -5,9 +5,12 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <string.h>
+
 #include "dllLayer.h"
 #include "appLayer.h"
+
 #include "../Frames/dllFrame.h"
+
 #include "../drivers/uart.h"
 #include "../drivers/hm-10.h"
 #include "../drivers/buttonInterface.h"
@@ -18,13 +21,11 @@ static uint8_t writeIndex = 0;
 static uint8_t readIndex = 0;
 static uint8_t preambleIndex = 0;
 
-
 //static const uint8_t DLLMAXFRAMESIZE = 1 + 2 + 1 + 1 + 2 + 64 + 16;
 
 enum firmwareStates {
     missing_preamble,
-    more_data,
-    done
+    more_data
 };
 
 enum firmwareStates firmwareState = missing_preamble;
@@ -77,14 +78,16 @@ void receiveDll(uint8_t uartNumber) {
 }
 
 void sendAckNack(bool ack) {
-    uint16_t totalDllFrameSize = getDllSizeByCommand(AckNack);
+    /*uint16_t totalDllFrameSize = getDllSizeByCommand(AckNack);
     uint16_t totalAppFrameSize = appFrameSize(AckNack);
     uint8_t dllFrame[totalAppFrameSize];
     uint8_t appFrame[totalAppFrameSize];
     createAckNackAppFrameBytes(appFrame, ack);
-    createDllFrame(appFrame, dllFrame, totalAppFrameSize);
+    createDllFrame(appFrame, dllFrame, totalAppFrameSize);*/
 
-    send(dllFrame, totalDllFrameSize);
+    sendAckNackAppFrameBytes(ack);
+
+//    send(dllFrame, totalDllFrameSize);
 }
 
 
@@ -136,7 +139,6 @@ bool checkForFW() {
     }
 
     uint16_t appFrameSize = fwFrameLengthOrg - getDllSizeWithoutApp();
-
     uint8_t appFrame[appFrameSize];
     uint16_t appFrameStartIndex = getAppStartIndex();
 
@@ -144,6 +146,7 @@ bool checkForFW() {
 
     appReceive(appFrame);
     sendAckNack(true);
+    firmwareState = missing_preamble;
 
     return true;
 }

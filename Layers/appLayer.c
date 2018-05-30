@@ -5,15 +5,19 @@
 #include <string.h>
 #include <stdbool.h>
 #include <avr/io.h>
+#include <avr/wdt.h>
+
 #include "appLayer.h"
-#include "../drivers/buttonInterface.h"
 #include "dllLayer.h"
+
+#include "../drivers/buttonInterface.h"
+#include "../Frames/appFrame.h"
 
 static uint8_t profile = 1;
 static const uint8_t profileMin = 1;
 static const uint8_t profileMax = 5;
 static bool profileRising = true;
-
+static uint16_t segmentsToReceive = 0;
 
 uint16_t appFrameSize(Command command) {
     return getPayloadSizeBasedOfCommand(command);
@@ -23,6 +27,13 @@ void createAckNackAppFrameBytes(uint8_t *appFrame, bool ack) {
     createAppFrame(appFrame, AckNack, (uint8_t *)&ack);
 }
 
+
+void sendAckNackAppFrameBytes(bool ack) {
+    uint16_t appFrameSize = getPayloadSizeBasedOfCommand(AckNack);
+    uint8_t ackFrame[appFrameSize];
+    createAckNackAppFrameBytes(ackFrame, ack);
+    dllSend(ackFrame, appFrameSize);
+}
 
 void setLEDs() {
     // ones = PORTB1
@@ -84,9 +95,41 @@ void sendControl(button_t button, event_t event) {
     dllSend(frame, frameSize);
 }
 
+void resetToBootloader() {
+    // TODO Set flags that persist between reboots
+    wdt_enable(WDTO_15MS);
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
+    while (1) {
+
+    }
+#pragma clang diagnostic pop
+}
 
 void appReceive(uint8_t* appFrame) {
     AppFrame appFrameObj;
     createAppFrameFromBytes(&appFrameObj, appFrame);
     // TODO Handle the receive
+
+    switch (appFrameObj.cmd) {
+        case FWReset:
+            // Send Ack
+            sendAckNackAppFrameBytes(true);
+            // Set flag and reset to bootloader
+            resetToBootloader();
+            break;
+        case FWSegCount:
+            segmentsToReceive = (appFrameObj.payload[0] << 8u) + appFrameObj.payload[1];
+            // Send Ack
+            sendAckNackAppFrameBytes(true);
+            break;
+        case FWSeg:
+            // Count down segmentsToReceive
+            --segmentsToReceive;
+            // Save the segment
+            sendAckNackAppFrameBytes(true);
+            break;
+        default:
+            break;
+    }
 }
