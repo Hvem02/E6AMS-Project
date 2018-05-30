@@ -19,4 +19,15 @@ void switchProfile(button_t button, event_t event);
 void setLEDs();
 void appReceive(uint8_t* appFrame);
 
+/**
+ *
+ */
+typedef void (* FwSegmentReceiveCallback_t)(AppFrame * appframe);
+
+/**
+ *
+ * @param recieveCallback
+ */
+void registerFwSegmentReceiveCallback(FwSegmentReceiveCallback_t recieveCallback);
+
 #endif //E6AMS_APPLAYER_H
