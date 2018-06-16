@@ -15,13 +15,8 @@ static const uint8_t commandPayloadSize[] = {
         0, // FWReset
         0, // FWReady
         2, // FWSegmentCount
-        64
+        64 // Max size of a segment
 };
-
-
-/*uint16_t getControlAppFrameSize() {
-    return CMD_SIZE+LEN_SIZE+2; // cmd + len + profile + button
-}*/
 
 uint16_t getPayloadSizeBasedOfCommand(Command command) {
     return (CMD_SIZE + LEN_SIZE + commandPayloadSize[command]);
@@ -40,6 +35,11 @@ void createAckNackAppFrame(AppFrame* appFrame, bool ack) {
     appFrame->payloadLength = 1;
     uint8_t payload = ((uint8_t) ack);
     memcpy(appFrame->payload, &payload, 1);
+}
+
+void createFWReadyFrame(uint8_t* appFrame) {
+    uint8_t *payload;
+    createAppFrame(appFrame, FWReady, payload);
 }
 
 void createAppFrame(uint8_t* appFrame, Command command, uint8_t* payload) {

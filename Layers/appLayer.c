@@ -17,9 +17,7 @@ static uint8_t profile = 1;
 static const uint8_t profileMin = 1;
 static uint8_t profileMax = 5;
 static bool profileRising = true;
-static uint16_t segmentsToReceive = 0;
-
-static FwSegmentReceiveCallback_t FwSegmentReceiveCallback = NULL;
+static fwUploadCallback_t fwUploadCallback = NULL;
 
 uint16_t appFrameSize(Command command) {
     return getPayloadSizeBasedOfCommand(command);
@@ -108,30 +106,39 @@ void resetToBootloader() {
 #pragma clang diagnostic pop
 }
 
+
+void readyForFWUpload() {
+    uint8_t appFrameLength = 3;
+    uint8_t appFrame[appFrameLength]; // Command, length, 0 payload
+    createFWReadyFrame(appFrame);
+    dllSend(appFrame, appFrameLength);
+}
+
+void setFWUploadHandle(fwUploadCallback_t fwUploadCB) {
+    fwUploadCallback = fwUploadCB;
+}
+
+
 void appReceive(uint8_t* appFrame) {
     AppFrame appFrameObj;
     createAppFrameFromBytes(&appFrameObj, appFrame);
-    // TODO Handle the receive
 
     switch (appFrameObj.cmd) {
         case FWReset:
-            // Send Ack
-            sendAckNackAppFrameBytes(true);
             // Set flag and reset to bootloader
             resetToBootloader();
             break;
         case FWSegCount:
-            segmentsToReceive = (appFrameObj.payload[0] << 8u) + appFrameObj.payload[1];
+            if(fwUploadCallback != NULL) {
+                fwUploadCallback(appFrameObj);
+            }
             // Send Ack
             sendAckNackAppFrameBytes(true);
             break;
         case FWSeg:
-            if(FwSegmentReceiveCallback != NULL)
-            {
-                FwSegmentReceiveCallback(&appFrameObj);
+            if(fwUploadCallback != NULL) {
+                fwUploadCallback(appFrameObj);
             }
-            // Count down segmentsToReceive
-            --segmentsToReceive;
             // Save the segment
             sendAckNackAppFrameBytes(true);
             break;
@@ -142,9 +149,4 @@ void appReceive(uint8_t* appFrame) {
         default:
             break;
     }
-}
-
-void registerFwSegmentReceiveCallback(FwSegmentReceiveCallback_t recieveCallback)
-{
-    FwSegmentReceiveCallback = recieveCallback;
 }

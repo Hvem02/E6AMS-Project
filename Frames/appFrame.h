@@ -33,6 +33,7 @@ uint16_t getPayloadSizeBasedOfCommand(Command command);
  */
 void createControlFrame(uint8_t *frame, uint8_t profile, uint8_t button);
 
+void createFWReadyFrame(uint8_t* appFrame);
 
 void createAppFrame(uint8_t* appFrame, Command command, uint8_t* payload);
 
