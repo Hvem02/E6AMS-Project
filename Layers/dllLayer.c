@@ -91,11 +91,11 @@ void sendAckNack(bool ack) {
 }
 
 
-bool checkForFW() {
+void checkForFW() {
 
     if (firmwareState == missing_preamble) {
         // No new data
-        return false;
+        return;
     }
 
     uint8_t bytesReady;
@@ -104,21 +104,21 @@ bool checkForFW() {
     if (writeIndex > readIndex) {
         bytesReady = writeIndex - readIndex;
     } else {
-        // -2, because of an additional index for ensuring \0 in BUFFER_SIZE and an additional minus for making an index
+        // -1, because of an additional index for ensuring \0 in BUFFER_SIZE
         bytesReady = (uint8_t ) (BUFFER_SIZE - 1 - readIndex + writeIndex);
         wrappingAround = true;
     }
 
     // Make sure we have the Preamble and two length bytes before handling data
     if (bytesReady < 3) {
-        return false;
+        return;
     }
 
     uint16_t fwFrameLength = (uint16_t) ((receiveBuffer[preambleIndex+1] << 8u) + receiveBuffer[preambleIndex+2] + 3u);
     uint16_t fwFrameLengthOrg = fwFrameLength;
 
     if (fwFrameLength > bytesReady) {
-        return false;
+        return;
     }
 
     uint8_t fwFrame[fwFrameLength];
@@ -135,7 +135,7 @@ bool checkForFW() {
 
     if (dllFrameValid(fwFrame) == false) {
         sendAckNack(false);
-        return false;
+        return;
     }
 
     uint16_t appFrameSize = fwFrameLengthOrg - getDllSizeWithoutApp();
@@ -147,8 +147,6 @@ bool checkForFW() {
     appReceive(appFrame);
     sendAckNack(true);
     firmwareState = missing_preamble;
-
-    return true;
 }
 
 void dllSend(uint8_t* appFrame, uint16_t appFrameLength) {

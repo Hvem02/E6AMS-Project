@@ -17,6 +17,6 @@ void receiveDll(uint8_t uartNumber);
 void initDll();
 void dllSend(uint8_t* appFrame, uint16_t appFrameLength);
 
-bool checkForFW();
+void checkForFW();
 
 #endif //E6AMS_DLLLAYER_H
