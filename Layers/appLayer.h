@@ -10,6 +10,8 @@
 #include "../Frames/appFrame.h"
 #include "../drivers/buttonInterface.h"
 
+#define FW_UPLOAD_FLAG 42
+
 uint16_t appFrameSize(Command command);
 
 typedef void (* fwUploadCallback_t)(AppFrame rcvFrame);

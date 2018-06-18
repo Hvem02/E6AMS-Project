@@ -4,6 +4,8 @@
 
 #include <string.h>
 #include <stdbool.h>
+
+#include <avr/eeprom.h>
 #include <avr/io.h>
 #include <avr/wdt.h>
 
@@ -96,7 +98,6 @@ void sendControl(button_t button, event_t event) {
 }
 
 void resetToBootloader() {
-    // TODO Set flags that persist between reboots
     wdt_enable(WDTO_15MS);
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
@@ -126,6 +127,7 @@ void appReceive(uint8_t* appFrame) {
     switch (appFrameObj.cmd) {
         case FWReset:
             // Set flag and reset to bootloader
+            eeprom_update_byte((uint8_t *) FW_UPLOAD_FLAG, 1);
             resetToBootloader();
             break;
         case FWSegCount:

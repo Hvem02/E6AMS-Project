@@ -25,10 +25,12 @@
  * | 115200             | 8     | -3.5% | 16    | 2.1%  |
  */
 
-#include <avr/io.h>
-#include <util/delay.h>
-#include <avr/interrupt.h>
 #include <string.h>
+
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+#include <util/delay.h>
 
 #include "drivers/uart.h"
 #include "drivers/hm-10.h"
@@ -50,10 +52,6 @@ int main()
 //    mainProgram();
     testProgramAlex();
 //    testProgramSoren();
-}
-
-void buttonLeftCallback(void) {
-
 }
 
 void mainProgram(void)
