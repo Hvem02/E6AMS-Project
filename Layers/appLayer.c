@@ -132,14 +132,14 @@ void appReceive(uint8_t* appFrame) {
             break;
         case FWSegCount:
             if(fwUploadCallback != NULL) {
-                fwUploadCallback(appFrameObj);
+                fwUploadCallback(&appFrameObj);
             }
             // Send Ack
             sendAckNackAppFrameBytes(true);
             break;
         case FWSeg:
             if(fwUploadCallback != NULL) {
-                fwUploadCallback(appFrameObj);
+                fwUploadCallback(&appFrameObj);
             }
             // Save the segment
             sendAckNackAppFrameBytes(true);

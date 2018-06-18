@@ -14,7 +14,7 @@
 
 uint16_t appFrameSize(Command command);
 
-typedef void (* fwUploadCallback_t)(AppFrame rcvFrame);
+typedef void (* fwUploadCallback_t)(AppFrame* rcvFrame);
 
 void createAckNackAppFrameBytes(uint8_t *appFrame, bool ack);
 void sendAckNackAppFrameBytes(bool ack);
