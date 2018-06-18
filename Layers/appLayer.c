@@ -108,7 +108,7 @@ void resetToBootloader() {
 }
 
 
-void readyForFWUpload() {
+void sendReadyForFWUpload() {
     uint8_t appFrameLength = 3;
     uint8_t appFrame[appFrameLength]; // Command, length, 0 payload
     createFWReadyFrame(appFrame);
