@@ -127,7 +127,7 @@ void appReceive(uint8_t* appFrame) {
     switch (appFrameObj.cmd) {
         case FWReset:
             // Set flag and reset to bootloader
-            eeprom_update_byte((uint8_t *) FW_UPLOAD_FLAG, 1);
+            eeprom_update_byte((uint8_t *) FW_UPLOAD_FLAG, FW_UPLOAD_READY);
             resetToBootloader();
             break;
         case FWSegCount:

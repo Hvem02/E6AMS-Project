@@ -11,6 +11,7 @@
 #include "../drivers/buttonInterface.h"
 
 #define FW_UPLOAD_FLAG 42
+#define FW_UPLOAD_READY 1
 
 uint16_t appFrameSize(Command command);
 
