@@ -38,8 +38,8 @@ void createAckNackAppFrame(AppFrame* appFrame, bool ack) {
 }
 
 void createFWReadyFrame(uint8_t* appFrame) {
-    uint8_t *payload;
-    createAppFrame(appFrame, FWReady, payload);
+    uint8_t payload = 'a';
+    createAppFrame(appFrame, FWReady, &payload);
 }
 
 void createAppFrame(uint8_t* appFrame, Command command, uint8_t* payload) {

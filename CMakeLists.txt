@@ -24,5 +24,6 @@ set(
         "${CMAKE_EXE_LINKER_FLAGS} -Wl,-Map=output.map"
 )
 
-set(SOURCE_FILES main.c drivers/uart.c drivers/uart.h drivers/hm-10.c drivers/hm-10.h drivers/buttonInterface.c drivers/buttonInterface.h Layers/dllLayer.c Layers/dllLayer.h Frames/dllFrame.c Frames/dllFrame.h Frames/appFrame.c Frames/appFrame.h external_libs/md5.c external_libs/md5.h external_libs/global.h Layers/appLayer.c Layers/appLayer.h Library/command.h)
+#set(SOURCE_FILES main.c drivers/uart.c drivers/uart.h drivers/hm-10.c drivers/hm-10.h drivers/buttonInterface.c drivers/buttonInterface.h Layers/dllLayer.c Layers/dllLayer.h Frames/dllFrame.c Frames/dllFrame.h Frames/appFrame.c Frames/appFrame.h external_libs/md5.c external_libs/md5.h external_libs/global.h Layers/appLayer.c Layers/appLayer.h Library/command.h external_libs/openssl/md5.c external_libs/openssl/md5.h)
+set(SOURCE_FILES main.c drivers/uart.c drivers/uart.h drivers/hm-10.c drivers/hm-10.h drivers/buttonInterface.c drivers/buttonInterface.h Layers/dllLayer.c Layers/dllLayer.h Frames/dllFrame.c Frames/dllFrame.h Frames/appFrame.c Frames/appFrame.h Layers/appLayer.c Layers/appLayer.h Library/command.h external_libs/openssl/md5.c external_libs/openssl/md5.h)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})

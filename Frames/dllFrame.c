@@ -5,7 +5,7 @@
 #include <string.h>
 #include <util/crc16.h>
 #include "dllFrame.h"
-#include "../external_libs/md5.h"
+#include "../external_libs/openssl/md5.h"
 #include "../Library/command.h"
 #include "appFrame.h"
 
@@ -47,11 +47,15 @@ uint16_t getDllSizeWithoutApp() {
  */
 void createHash(uint8_t* dllFrameNoMD5, uint16_t dllFrameSizeNoMD5) {
     // Following md5 usage is inspired from https://stackoverflow.com/a/8389763
-    MD5_CTX md5_ctx;
+
+    md5_hash_t hash;
+    md5(&hash, dllFrameNoMD5, dllFrameSizeNoMD5);
+
+    /*MD5_CTX md5_ctx;
     MD5Init(&md5_ctx);
     MD5Update(&md5_ctx, dllFrameNoMD5, dllFrameSizeNoMD5);
     uint8_t hash[hashSize];
-    MD5Final(hash, &md5_ctx);
+    MD5Final(hash, &md5_ctx);*/
 
     memcpy(&dllFrameNoMD5[dllFrameSizeNoMD5], hash, hashSize);
 
@@ -92,11 +96,14 @@ void dllFrameFromBytes(DllFrame* res, uint8_t* frame, uint8_t* appPayload) {
 
 bool hashEqual(uint8_t* frame, uint16_t length) {
     uint16_t frameLengthNoMD5 = length-hashSize;
-    MD5_CTX md5_ctx;
+
+    md5_hash_t hash;
+    md5(&hash, frame, frameLengthNoMD5);
+    /*MD5_CTX md5_ctx;
     MD5Init(&md5_ctx);
     MD5Update(&md5_ctx, frame, frameLengthNoMD5);
     uint8_t hash[hashSize];
-    MD5Final(hash, &md5_ctx);
+    MD5Final(hash, &md5_ctx);*/
     return (memcmp(hash, &frame[frameLengthNoMD5], hashSize) == 0)? true:false;
 }
 
